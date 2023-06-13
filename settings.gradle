@@ -1,0 +1,18 @@
+
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    maven {
+      name = "sonatype"
+      url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+    }
+  }
+}
+plugins {
+    // Apply the foojay-resolver plugin to allow automatic download of JDKs
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.4.0'
+}
+
+rootProject.name = 'da-otel-agent'
+include('extension')
+include('service')
