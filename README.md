@@ -1,10 +1,15 @@
 
 # DA OpenTelemetry Agent and Configuration Service
 
-
 This project includes a web service with a Representational State Transfer (REST) Application Programming Interface (API). The web service is designed to manage OpenTelemetry Sampler Configurations.
 
-## OpenTelemetry Configuration Service
+## Motivation
+
+By creating a remotely controlled agent, we can dynamically change its behavior based on the current needs. For example, we could adjust sampling rates, enable or disable certain types of telemetry, or update configuration settings, all without having to redeploy or restart our applications.
+
+## Components
+
+### OpenTelemetry Configuration Service
 
 The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different sampler configurations. The sampler is a part of the OpenTelemetry SDK that determines whether a given span should be sampled and processed further. The configurations define the conditions under which a span is considered for sampling.
 
@@ -12,7 +17,7 @@ This service exposes a RESTful API that allows clients to interact with it. The 
 
 You can use HTTP methods like GET, POST, PUT, DELETE, etc., to interact with the service via the REST API. For instance, you can retrieve current configurations, create new configurations, update existing ones, or delete configurations.
 
-## OpenTelemetry Java Agent Extension
+### OpenTelemetry Java Agent Extension
 
 The project also includes an extension to the standard OpenTelemetry Java agent. This extension enables the Java agent to dynamically change the sampler implementation and its configuration.
 
@@ -30,6 +35,8 @@ A minimum configuration for the application side is as follows:
   -Dotel.traces.sampler="dynamic" \
   -Dotel.configuration.service.url="http://otel-configuration-service-url" \
 ```
+
+Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used.
 
 ## Local testing
 
