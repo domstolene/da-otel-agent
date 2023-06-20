@@ -5,7 +5,6 @@
 package no.domstol.otel.agent.configuration;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.http.HttpEntity;
@@ -24,16 +23,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 
 /**
- * This type dynamically provides configurations for the OTEL agent. The
  *
  * @since 1.0
  */
-public class DynamicAgentConfigurationProvider {
+public class AgentConfigurationServiceClient {
 
-    private static final Logger logger = Logger.getLogger(DynamicAgentConfigurationProvider.class.getName());
+    private static final Logger logger = Logger.getLogger(AgentConfigurationServiceClient.class.getName());
     private static final CloseableHttpClient httpClient = HttpClients.createDefault();
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String fallbackServicename = UUID.randomUUID().toString();
 
     /**
      * Calls the configuration service to obtain a sampler configuration for this
@@ -43,31 +40,31 @@ public class DynamicAgentConfigurationProvider {
      * @param config
      *
      * @return the agent configuration
-     * @see DynamicAgentConfiguration
+     * @see AgentConfiguration
      */
-    public DynamicAgentConfiguration getDynamicConfiguration(ConfigProperties config) {
+    public AgentConfiguration getDynamicConfiguration(AgentConfiguration configuration, ConfigProperties config) {
         // Use the fallback service name if none have been specified
-        String serviceName = config.getString("otel.service.name", fallbackServicename);
         String configurationServiceUrl = config.getString("otel.configuration.service.url", "http://localhost:8080");
-        DynamicAgentConfiguration defaultAgentConfiguration = new DynamicAgentConfiguration(serviceName);
         try {
-            HttpGet request = new HttpGet(configurationServiceUrl + "/agent-configuration/" + serviceName);
+            HttpGet request = new HttpGet(
+                    configurationServiceUrl + "/agent-configuration/" + configuration.getServiceName());
             request.addHeader("Accept", "application/json");
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     String result = EntityUtils.toString(entity);
-                    DynamicAgentConfiguration agentConfiguration = objectMapper.readValue(result, DynamicAgentConfiguration.class);
+                    AgentConfiguration agentConfiguration = objectMapper.readValue(result, AgentConfiguration.class);
                     return agentConfiguration;
                 }
             } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 try {
                     HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
-                    postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(defaultAgentConfiguration),
+                    postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(configuration),
                             ContentType.APPLICATION_JSON.withCharset("UTF-8")));
                     httpClient.execute(postRequest);
-                    logger.severe("Self-registered as \"" + serviceName + "\" at the OTEL Configuration Service");
+                    logger.info("Self-registered as \"" + configuration.getServiceName()
+                            + "\" at the OTEL Configuration Service");
                 } catch (IOException e) {
                     logger.severe("Failed to self-register at the OTEL Configuration Service");
                 }
@@ -76,9 +73,9 @@ public class DynamicAgentConfigurationProvider {
             }
         } catch (IOException e) {
             logger.severe("Could not connect to OTEL Configuration Service at " + configurationServiceUrl
-                    + ", using default sampler \"" + defaultAgentConfiguration.getSampler() + "\".");
+                    + ", using sampler \"" + configuration.getSampler() + "\".");
         }
-        return defaultAgentConfiguration;
+        return configuration;
     }
 
 }

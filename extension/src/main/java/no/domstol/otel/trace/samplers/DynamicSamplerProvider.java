@@ -4,25 +4,38 @@
  */
 package no.domstol.otel.trace.samplers;
 
+import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.auto.service.AutoService;
 
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.traces.ConfigurableSamplerProvider;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
-import no.domstol.otel.agent.configuration.DynamicAgentConfiguration;
-import no.domstol.otel.agent.configuration.DynamicAgentConfigurationProvider;
+import no.domstol.otel.agent.configuration.AgentConfiguration;
+import no.domstol.otel.agent.configuration.AgentConfigurationServiceClient;
 
 /**
- * This type's responsibility is to create an initial sampler when first called,
- * then periodically call the sampler configuration service and update settings
- * as required. This may include changing the actual sampler, along with it's
- * configuration. In order to make use of this sampler provider, the agent must
- * be configured with
+ * This type dynamically provides configurations for the OTEL agent. In order to
+ * do so, it will connect to the OTEL Agent Configuration Service or read the
+ * configuration from a file, or both. The order is as follows:
+ * <ol>
+ * <li>Read the configuration from a file if specified in
+ * <code>otel.configuration.service.file</code></li>
+ * <li>Read the configuration from a service if specified in
+ * <code>otel.configuration.service.url</code></li>
+ * <li>Periodically poll the service for an updated configuration</li>
+ * <li>Read the configuration from the specified file, if the file has
+ * changed</li>
+ * </ol>
+ *
+ * In order to make use of this sampler provider, the agent must be configured
+ * with
  *
  * <pre>
  * -Dotel.traces.sampler="dynamic"
@@ -34,35 +47,60 @@ import no.domstol.otel.agent.configuration.DynamicAgentConfigurationProvider;
 public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
     private static final Logger logger = Logger.getLogger(DynamicSamplerProvider.class.getName());
-    private static DynamicAgentConfigurationProvider provider = new DynamicAgentConfigurationProvider();
+    private static AgentConfigurationServiceClient client = new AgentConfigurationServiceClient();
     private static DynamicSamplerWrapper wrapper;
     private static ConfigProperties initialConfig;
+    private static AgentConfiguration configuration = new AgentConfiguration();
 
     public DynamicSamplerProvider() {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(DynamicSamplerProvider::updateSampler, 5, 5, TimeUnit.SECONDS);
     }
 
     @Override
     public Sampler createSampler(ConfigProperties config) {
         initialConfig = config;
-        Sampler initialSampler = getConfiguredSampler(config);
-        wrapper = new DynamicSamplerWrapper(initialSampler);
+
+        String configurationServiceFile = config.getString("otel.configuration.service.file");
+        String configurationServiceUrl = config.getString("otel.configuration.service.url");
+
+        if (configurationServiceFile == null && configurationServiceUrl == null) {
+            throw new IllegalArgumentException(
+                    "One of 'otel.configuration.service.file' and 'otel.configuration.service.url' must be specified");
+        }
+
+        // read the configuration from a file if specified
+        if (configurationServiceFile != null) {
+            File file = new File(configurationServiceFile);
+            if (!file.exists()) {
+                logger.severe("The specified configuration file '" + file + "' does not exist!");
+            }
+            logger.info("Loading OTEL Agent configuration from " + file);
+            configuration = readConfigurationFile(file);
+            wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
+        }
+
+        // read the configuration from the service
+        if (configurationServiceUrl != null) {
+            configuration = client.getDynamicConfiguration(configuration, config);
+            wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
+            // periodically poll the service for an updated configuration
+            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+            executor.scheduleAtFixedRate(DynamicSamplerProvider::updateConfigurationFromService, 5, 5, TimeUnit.SECONDS);
+        }
         return wrapper;
     }
 
-    private static void updateSampler() {
-        Sampler configuredSampler = getConfiguredSampler(initialConfig);
-        if (!configuredSampler.equals(wrapper.getCurrentSampler())) {
-            logger.info("Changing sampler to " + configuredSampler);
-            wrapper.setCurrentSampler(configuredSampler);
+    private static void updateConfigurationFromService() {
+        AgentConfiguration newConfiguration = client.getDynamicConfiguration(configuration, initialConfig);
+        if (!newConfiguration.equals(configuration)) {
+            logger.info("Changing configuration and sampler to " + newConfiguration.getSampler());
+            wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
+            wrapper.setRules(newConfiguration.getRules());
+            configuration = newConfiguration;
         }
     }
 
-    private static Sampler getConfiguredSampler(ConfigProperties config) {
-        // use the configuration service to obtain a sampler for this application
-        DynamicAgentConfiguration configuration = provider.getDynamicConfiguration(config);
-        Sampler configuredSampler = Sampler.alwaysOn();
+    private static Sampler getConfiguredSampler(AgentConfiguration configuration) {
+        Sampler configuredSampler = Sampler.alwaysOff();
         switch (configuration.getSampler()) {
         case always_off:
             configuredSampler = Sampler.alwaysOff();
@@ -73,12 +111,32 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
         case traceidratio:
             configuredSampler = Sampler.traceIdRatioBased(configuration.getSampleRatio());
             break;
-        // TODO: Handle parentbased_always_on,parentbased_always_off,
-        // parentbased_traceidratio
+        case parentbased_always_off:
+            configuredSampler = Sampler.parentBased(Sampler.alwaysOff());
+            break;
+        case parentbased_always_on:
+            configuredSampler = Sampler.parentBased(Sampler.alwaysOn());
+            break;
+        case parentbased_traceidratio:
+            configuredSampler = Sampler
+                .parentBasedBuilder(Sampler.traceIdRatioBased(configuration.getSampleRatio()))
+                    .build();
+            break;
         default:
             break;
         }
         return configuredSampler;
+    }
+
+    private AgentConfiguration readConfigurationFile(File file) {
+        try {
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            AgentConfiguration configuration = mapper.readValue(file, AgentConfiguration.class);
+            return configuration;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
