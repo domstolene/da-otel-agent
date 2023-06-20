@@ -40,26 +40,22 @@ public class DynamicSamplerWrapper implements Sampler {
     public SamplingResult shouldSample(Context parentContext, String traceId, String name, SpanKind spanKind,
             Attributes attributes, List<LinkData> parentLinks) {
         try {
+
             // Include samples based on the rules provided
             List<Map<AttributeKey<String>, Pattern>> includes = rules.get("include");
             if (includes != null) {
                 for (Map<AttributeKey<String>, Pattern> group : includes) {
-                    boolean exclude = false;
+                    boolean include = false;
                     for (AttributeKey<String> key : group.keySet()) {
                         String string = attributes.get(key);
-                        if (string != null) {
-                            if (group.get(key).matcher(string).find()) {
-                                exclude = true;
+                        if (string != null && group.get(key).matcher(string).find()) {
+                                include = true;
                             } else {
-                                exclude = false;
+                                include = false;
                                 break;
-                            }
-                        } else {
-                            exclude = false;
-                            break;
                         }
                     }
-                    if (exclude) {
+                    if (include) {
                         logger.info("including sample because " + group);
                         return SamplingResult.create(SamplingDecision.RECORD_AND_SAMPLE);
                     }
@@ -72,17 +68,12 @@ public class DynamicSamplerWrapper implements Sampler {
                     boolean exclude = false;
                     for (AttributeKey<String> key : group.keySet()) {
                         String string = attributes.get(key);
-                        if (string != null) {
-                            if (group.get(key).matcher(string).find()) {
+                        if (string != null && group.get(key).matcher(string).find()) {
                                 exclude = true;
                             } else {
                                 exclude = false;
                                 break;
                             }
-                        } else {
-                            exclude = false;
-                            break;
-                        }
                     }
                     if (exclude) {
                         logger.info("Dropping sample because " + group);
