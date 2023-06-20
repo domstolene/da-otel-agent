@@ -15,26 +15,45 @@ The _OpenTelemetry Configuration Service_ is a component of this project that ke
 
 This service exposes a RESTful API that allows clients to interact with it. The API provides a programmatic interface to the service, allowing software clients to interact with the service.
 
-You can use HTTP methods like GET, POST, PUT, DELETE, etc., to interact with the service via the REST API. For instance, you can retrieve current configurations, create new configurations, update existing ones, or delete configurations.
+You can use HTTP methods like `GET`, `POST`, `PUT`, `DELETE`, etc., to interact with the service via the REST API. For instance, you can retrieve current configurations, create new configurations, update existing ones, or delete configurations.
 
 ### OpenTelemetry Java Agent Extension
 
 The project also includes an extension to the standard OpenTelemetry Java agent. This extension enables the Java agent to dynamically change the sampler implementation and its configuration.
 
-The OpenTelemetry Java agent is a tool that automatically instruments your Java application to track transactions and report metrics. Our extension enhances this agent's capabilities by allowing it to switch between different sampler implementations and configurations on the fly.
+The OpenTelemetry Java agent is a tool that automatically instruments your Java application to track transactions and report metrics. Our extension enhances this agent's capabilities by allowing it to switch between different sampler implementations and configurations on the fly. It also includes a basic filtering mechanism that allows samples to be ignored or accepted based on a simple set of rules.
 
 This means that you can adjust your sampling strategy during runtime without having to stop and restart your application. It adds a great deal of flexibility to your observability strategy and can help you adapt to changing system dynamics or diagnostic needs.
 
+#### Filtering
+
 ## Usage
 
-A minimum configuration for the application side is as follows:
+There are basically three ways of configuring the agent. Either you use a file based configuration, a service based or both. 
+
+A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will then connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this.
+
+### Example configuration
 
 ```shell
   -javaagent:da-opentelemetry-javaagent.jar \
-  -Dotel.service.name="my-service-name" \
   -Dotel.traces.sampler="dynamic" \
-  -Dotel.configuration.service.url="http://otel-configuration-service-url" \
+  -Dotel.configuration.service.file="otel-configuration-file.yaml" \
+  -Dotel.configuration.service.url="http://otel-configuration-service" \
 ```
+
+```yaml
+serviceName: my-service-name
+sampler: parentbased_always_off
+sampleRatio: 0.1
+rules:
+  - exclude:
+    - http.target: "/agent-configuration/.+"
+      http.method: "GET"
+  - include:
+    - http.method: "POST"
+```
+
 
 Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used.
 

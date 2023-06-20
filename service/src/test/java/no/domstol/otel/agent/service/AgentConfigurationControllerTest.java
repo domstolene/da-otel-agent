@@ -35,7 +35,7 @@ public class AgentConfigurationControllerTest {
     @InjectMocks
     private AgentConfigurationController agentConfigurationController;
 
-    private static ConcurrentMap<String, DynamicAgentConfiguration> configurations;
+    private static ConcurrentMap<String, AgentConfiguration> configurations;
 
     @BeforeEach
     public void setUp() {
@@ -46,14 +46,14 @@ public class AgentConfigurationControllerTest {
 
     @Test
     public void testAddAgentConfiguration() throws Exception {
-        DynamicAgentConfiguration agentConfiguration = new DynamicAgentConfiguration();
+        AgentConfiguration agentConfiguration = new AgentConfiguration();
         agentConfiguration.setServiceName("testAgent");
         configurations.put(agentConfiguration.getServiceName(), agentConfiguration);
 
         mockMvc.perform(post("/agent-configuration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(agentConfiguration)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         // Verify that the configuration has been added
         assert(configurations.containsKey("testAgent"));
@@ -61,7 +61,7 @@ public class AgentConfigurationControllerTest {
 
     @Test
     public void testGetAgentConfiguration() throws Exception {
-        DynamicAgentConfiguration agentConfiguration = new DynamicAgentConfiguration();
+        AgentConfiguration agentConfiguration = new AgentConfiguration();
         agentConfiguration.setServiceName("testAgent");
         configurations.put(agentConfiguration.getServiceName(), agentConfiguration);
 
@@ -73,11 +73,11 @@ public class AgentConfigurationControllerTest {
 
     @Test
     public void testEditAgentConfiguration() throws Exception {
-        DynamicAgentConfiguration agentConfiguration = new DynamicAgentConfiguration();
+        AgentConfiguration agentConfiguration = new AgentConfiguration();
         agentConfiguration.setServiceName("testAgent");
         configurations.put(agentConfiguration.getServiceName(), agentConfiguration);
 
-        DynamicAgentConfiguration newConfiguration = new DynamicAgentConfiguration();
+        AgentConfiguration newConfiguration = new AgentConfiguration();
         newConfiguration.setServiceName("testAgent");
         newConfiguration.setSampleRatio(0.5);
 
@@ -92,11 +92,11 @@ public class AgentConfigurationControllerTest {
 
     @Test
     public void testGetAllAgentConfigurations() throws Exception {
-        DynamicAgentConfiguration agentConfiguration1 = new DynamicAgentConfiguration();
+        AgentConfiguration agentConfiguration1 = new AgentConfiguration();
         agentConfiguration1.setServiceName("testAgent1");
         configurations.put(agentConfiguration1.getServiceName(), agentConfiguration1);
 
-        DynamicAgentConfiguration agentConfiguration2 = new DynamicAgentConfiguration();
+        AgentConfiguration agentConfiguration2 = new AgentConfiguration();
         agentConfiguration2.setServiceName("testAgent2");
         configurations.put(agentConfiguration2.getServiceName(), agentConfiguration2);
 

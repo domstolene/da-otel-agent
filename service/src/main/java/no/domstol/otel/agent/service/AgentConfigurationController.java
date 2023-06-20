@@ -4,6 +4,8 @@
  */
 package no.domstol.otel.agent.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -27,15 +29,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AgentConfigurationController {
 
-    private ConcurrentMap<String, DynamicAgentConfiguration> configurations = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, AgentConfiguration> configurations = new ConcurrentHashMap<>();
 
     @PostMapping("/agent-configuration")
-    public void addAgentConfiguration(@RequestBody DynamicAgentConfiguration configuration) {
+    public ResponseEntity<Void> addAgentConfiguration(@RequestBody AgentConfiguration configuration)
+            throws URISyntaxException {
         getConfigurations().put(configuration.getServiceName(), configuration);
+        return ResponseEntity.created(new URI("/agent-configuration/" + configuration.getServiceName())).build();
     }
 
     @GetMapping("/agent-configuration/{agentName}")
-    public ResponseEntity<DynamicAgentConfiguration> getAgentConfiguration(@PathVariable String agentName) {
+    public ResponseEntity<AgentConfiguration> getAgentConfiguration(@PathVariable String agentName) {
         if (!getConfigurations().containsKey(agentName)) {
             return ResponseEntity.notFound().build();
         }
@@ -43,7 +47,17 @@ public class AgentConfigurationController {
     }
 
     @PutMapping("/agent-configuration/{agentName}")
-    public void editAgentConfiguration(@PathVariable String agentName, @RequestBody DynamicAgentConfiguration configuration) {
+    public ResponseEntity<Void> editAgentConfiguration(@PathVariable String agentName,
+            @RequestBody AgentConfiguration configuration) {
+        if (!getConfigurations().containsKey(agentName)) {
+            return ResponseEntity.notFound().build();
+        }
+        getConfigurations().put(configuration.getServiceName(), configuration);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/agent-configuration")
+    public void editAgentConfiguration(@RequestBody AgentConfiguration configuration) {
         getConfigurations().put(configuration.getServiceName(), configuration);
     }
 
@@ -53,18 +67,17 @@ public class AgentConfigurationController {
     }
 
     @GetMapping("/agent-configuration")
-    public List<DynamicAgentConfiguration> getAgentConfiguration() {
+    public List<AgentConfiguration> getAgentConfiguration() {
         // Wrap in a tree map to get sorted keys
         return new ArrayList<>(new TreeMap<>(configurations).values());
     }
 
-    public ConcurrentMap<String, DynamicAgentConfiguration> getConfigurations() {
+    public ConcurrentMap<String, AgentConfiguration> getConfigurations() {
         return configurations;
     }
 
-    public void setConfigurations(ConcurrentMap<String, DynamicAgentConfiguration> configurations) {
+    public void setConfigurations(ConcurrentMap<String, AgentConfiguration> configurations) {
         this.configurations = configurations;
     }
-
 
 }
