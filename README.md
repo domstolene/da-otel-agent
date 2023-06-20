@@ -37,9 +37,8 @@ A typical use case would be to set up a file based configuration while pointing 
 
 ```shell
   -javaagent:da-opentelemetry-javaagent.jar \
-  -Dotel.service.name="my-service-name" \
   -Dotel.traces.sampler="dynamic" \
-  -Dotel.configuration.service.url="otel-configuration-file.yaml" \
+  -Dotel.configuration.service.file="otel-configuration-file.yaml" \
   -Dotel.configuration.service.url="http://otel-configuration-service" \
 ```
 
