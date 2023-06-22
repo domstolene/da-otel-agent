@@ -1,15 +1,49 @@
+apply plugin: 'org.springframework.boot'
+
 plugins {
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'maven-publish'
 }
 
 group = 'no.domstol.otel'
-version = '1.0.0-SNAPSHOT'
+version = '1.0.0'
 sourceCompatibility = '17'
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+
+repositories {
+    maven {
+        name = "tilbakemelding-loggplattform"
+        url = uri("https://maven.pkg.github.com/domstolene/tilbakemelding-loggplattform")
+        credentials {
+            username = GITHUB_USER
+            password = GITHUB_TOKEN
+        }
+    }
+}
+
+
+publications {
+    create<MavenPublication>("maven") {
+        groupId = "no.domstolene"
+        artifactId = "tilbakemelding-loggplattform"
+
+        from(components["java"])
+        pom {
+            licenses {
+                license {
+                    name.set("GNU Lesser General Public License version 3 or later")
+                    url.set("https://www.gnu.org/licenses/lgpl-3.0.txt")
+                }
+            }
+        }
+    }
 }
 
 dependencies {

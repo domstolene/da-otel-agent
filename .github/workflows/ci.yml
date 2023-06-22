@@ -25,8 +25,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         
-    - name: Build with Gradle
+    - name: Gradle validate wrapper
+      uses: gradle/wrapper-validation-action@v1
+
+    - name: Gradle build
       uses: gradle/gradle-build-action@v2
-      
-    - name: Execute Gradle build
-      run: ./gradlew build
+      with:
+        gradle-version: wrapper
+        arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
