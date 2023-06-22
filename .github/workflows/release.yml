@@ -1,10 +1,16 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
-name: Gradle Package
+name: Build and publish release
 
 on:
   release:
     types: [created]
+  workflow_dispatch:
+      release_version:
+        type: string
+        description: Release version.
+        required: false
+        default: "1.0.0"
 
 jobs:
   build:
@@ -29,10 +35,10 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: wrapper
-        arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
+        arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_ACTOR=${{ github.actor }}
 
     - name: Gradle publish
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: wrapper
-        arguments: publish --no-daemon -Pversion=${{needs.package-version.outputs.version}} -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
+        arguments: publish --no-daemon -Pversion=${{needs.package-version.outputs.version}} -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_ACTOR=${{ github.actor }}

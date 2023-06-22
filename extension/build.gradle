@@ -36,8 +36,8 @@ publishing {
           name = "da-otel-agent"
           url = uri("https://maven.pkg.github.com/domstolene/da-otel-agent")
           credentials {
-              username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
-              password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+              username = System.getenv("GITHUB_ACTOR")
+              password = System.getenv("GITHUB_TOKEN")
           }
       }
   }
