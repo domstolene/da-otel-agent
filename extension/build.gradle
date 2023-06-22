@@ -7,9 +7,6 @@ plugins {
 sourceCompatibility = 17
 targetCompatibility = 17
 
-group 'no.domstol.otel'
-version '1.0'
-
 ext {
   versions = [
     opentelemetrySdk           : "1.27.0",
@@ -45,7 +42,7 @@ publishing {
       maven(MavenPublication) {
           groupId = "no.domstolene"
           artifactId = "da-otel-agent"
-          version = "1.0"
+          version = "1.0.0"
 
           from components.java
       }

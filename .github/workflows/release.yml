@@ -29,26 +29,27 @@ jobs:
     - name: Gradle validate wrapper
       uses: gradle/wrapper-validation-action@v1
 
-    - name: Gradle build
+    - name: Gradle build agent and service
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: wrapper
         arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.CR_PAT }} -PGITHUB_ACTOR=${{ github.actor }}
 
-    - name: Gradle publish
+    - name: Gradle publish agent
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: wrapper
-        arguments: publish --no-daemon -Pversion=${{needs.package-version.outputs.version}} -PGITHUB_TOKEN=${{ secrets.CR_PAT }} -PGITHUB_ACTOR=${{ github.actor }}
+        arguments: publish --no-daemon -PGITHUB_TOKEN=${{ secrets.CR_PAT }} -PGITHUB_ACTOR=${{ github.actor }}
 
     # Get name of (single) artefact.
-    - name: Get JAR filename
+    - name: Get service JAR filename
       id: get-jarname
       run: |
         export JAR_NAME="$(basename $(ls service/build/libs/*.jar))"
         echo "jar is $JAR_NAME"
         echo "::set-output name=jarname::$JAR_NAME"
         echo "JAR_NAME=$JAR_NAME" >> $GITHUB_ENV
+
     # Upload artefact for use in next job.
     - uses: actions/upload-artifact@v3
       with:
