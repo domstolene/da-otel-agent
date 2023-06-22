@@ -73,7 +73,7 @@ jobs:
       # The registry we will push to
       REGISTRY: ghcr.io
       # Name of the GitHub repository,
-      IMAGE_NAME: ${{ github.repository }}
+      IMAGE_NAME: domstolene/da-otel-agent-configuration-service
     steps:
       # Download the JAR artefact from the compile step.
       - uses: actions/download-artifact@v3
