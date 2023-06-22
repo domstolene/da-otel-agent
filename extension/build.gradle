@@ -1,6 +1,10 @@
+val GITHUB_USER: String by project
+val GITHUB_TOKEN: String by project
+
 plugins {
   id "java"
   id "com.github.johnrengelman.shadow" version "8.1.1"
+  id 'maven-publish'
 }
 
 sourceCompatibility = 17
@@ -32,8 +36,8 @@ repositories {
 publishing {
   repositories {
       maven {
-          name = "tilbakemelding-loggplattform"
-          url = uri("https://maven.pkg.github.com/domstolene/tilbakemelding-loggplattform")
+          name = "da-otel-agent"
+          url = uri("https://maven.pkg.github.com/domstolene/da-otel-agent")
           credentials {
               username = GITHUB_USER
               password = GITHUB_TOKEN
@@ -43,14 +47,14 @@ publishing {
   publications {
       create<MavenPublication>("maven") {
           groupId = "no.domstolene"
-          artifactId = "tilbakemelding-loggplattform"
+          artifactId = "da-otel-agent"
 
           from(components["java"])
           pom {
               licenses {
                   license {
-                      name.set("GNU Lesser General Public License version 3 or later")
-                      url.set("https://www.gnu.org/licenses/lgpl-3.0.txt")
+                      name.set("Apache License, Version 2.0")
+                      url.set("http://www.apache.org/licenses/LICENSE-2.0 ")
                   }
               }
           }
