@@ -57,7 +57,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ env.JAR_NAME }}
-        path: target/${{ env.JAR_NAME }}
+        path: service/build/libs/${{ env.JAR_NAME }}
         if-no-files-found: error
           
   # Build and publish container image.
