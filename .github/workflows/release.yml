@@ -33,13 +33,16 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: wrapper
-        arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.CR_PAT }} -PGITHUB_ACTOR=${{ github.actor }}
+        arguments: build --no-daemon
 
     - name: Gradle publish agent
       uses: gradle/gradle-build-action@v2
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ github.actor }}
       with:
         gradle-version: wrapper
-        arguments: publish --no-daemon -PGITHUB_TOKEN=${{ secrets.CR_PAT }} -PGITHUB_ACTOR=${{ github.actor }}
+        arguments: publish --no-daemon
 
     # Get name of (single) artefact.
     - name: Get service JAR filename
