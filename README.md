@@ -25,6 +25,23 @@ The OpenTelemetry Java agent is a tool that automatically instruments your Java 
 
 This means that you can adjust your sampling strategy during runtime without having to stop and restart your application. It adds a great deal of flexibility to your observability strategy and can help you adapt to changing system dynamics or diagnostic needs.
 
+#### Filtering
+
+The `dynamic` sampler coming with the agent extension has an optional filtering mechanism. This applies filtering *before* the underlying sampler recieves the data. And can be used to force exclusion or inclusion of a span. Note that inclusion takes precedence.
+
+OTEL can automatically add certain pieces of metadata, or "tags", to each piece of data it collects. For HTTP requests, this might include things like the target URL of the request (http.target), or the HTTP method used (http.method). These tags are what is used for the filtering. For example:
+
+```yaml
+rules:
+  - exclude:
+    - http.target: "/health/.+"
+      http.method: "GET"
+  - include:
+    - http.method: "POST"
+```
+
+In this example all HTTP GET calls to the health endpoint are ignored, while all POST calls are sampled. If the tags does not match any of these configurations, it is up to the underlying sampler to determine whether or not the span should be included.
+
 ## Usage
 
 There are basically three ways of configuring the agent. Either you use a file based configuration, a service based or both. 
@@ -37,7 +54,7 @@ A typical use case would be to set up a file based configuration while pointing 
   -javaagent:da-opentelemetry-javaagent.jar \
   -Dotel.traces.sampler="dynamic" \
   -Dotel.configuration.service.file="otel-configuration-file.yaml" \
-  -Dotel.configuration.service.url="http://otel-configuration-service" \
+  -Dotel.configuration.service.url="http://otel-configuration-service.test" \
 ```
 
 ```yaml

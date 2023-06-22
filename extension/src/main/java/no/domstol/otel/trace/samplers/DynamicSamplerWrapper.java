@@ -56,7 +56,7 @@ public class DynamicSamplerWrapper implements Sampler {
                         }
                     }
                     if (include) {
-                        logger.info("including sample because " + group);
+                        logger.fine("including sample because " + group);
                         return SamplingResult.create(SamplingDecision.RECORD_AND_SAMPLE);
                     }
                 }
@@ -76,7 +76,7 @@ public class DynamicSamplerWrapper implements Sampler {
                             }
                     }
                     if (exclude) {
-                        logger.info("Dropping sample because " + group);
+                        logger.fine("Dropping sample because " + group);
                         return SamplingResult.create(SamplingDecision.DROP);
                     }
                 }
