@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,8 +33,12 @@ public class AgentConfigurationController {
     private ConcurrentMap<String, AgentConfiguration> configurations = new ConcurrentHashMap<>();
 
     @PostMapping("/agent-configuration")
-    public ResponseEntity<Void> addAgentConfiguration(@RequestBody AgentConfiguration configuration)
+    public ResponseEntity<String> addAgentConfiguration(@RequestBody AgentConfiguration configuration)
             throws URISyntaxException {
+        if (getConfigurations().containsKey(configuration.getServiceName())
+                && getConfigurations().get(configuration.getServiceName()).isReadOnly()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
+        }
         getConfigurations().put(configuration.getServiceName(), configuration);
         return ResponseEntity.created(new URI("/agent-configuration/" + configuration.getServiceName())).build();
     }
@@ -47,10 +52,13 @@ public class AgentConfigurationController {
     }
 
     @PutMapping("/agent-configuration/{agentName}")
-    public ResponseEntity<Void> editAgentConfiguration(@PathVariable String agentName,
+    public ResponseEntity<String> editAgentConfiguration(@PathVariable String agentName,
             @RequestBody AgentConfiguration configuration) {
         if (!getConfigurations().containsKey(agentName)) {
             return ResponseEntity.notFound().build();
+        }
+        if (getConfigurations().get(configuration.getServiceName()).isReadOnly()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
         }
         getConfigurations().put(configuration.getServiceName(), configuration);
         return ResponseEntity.ok().build();

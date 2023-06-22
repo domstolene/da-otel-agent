@@ -48,6 +48,7 @@ public class AgentConfigurationControllerTest {
     public void testAddAgentConfiguration() throws Exception {
         AgentConfiguration agentConfiguration = new AgentConfiguration();
         agentConfiguration.setServiceName("testAgent");
+        agentConfiguration.setReadOnly(false);
         configurations.put(agentConfiguration.getServiceName(), agentConfiguration);
 
         mockMvc.perform(post("/agent-configuration")
@@ -79,6 +80,7 @@ public class AgentConfigurationControllerTest {
 
         AgentConfiguration newConfiguration = new AgentConfiguration();
         newConfiguration.setServiceName("testAgent");
+        agentConfiguration.setReadOnly(false);
         newConfiguration.setSampleRatio(0.5);
 
         mockMvc.perform(put("/agent-configuration/testAgent")

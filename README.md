@@ -25,8 +25,6 @@ The OpenTelemetry Java agent is a tool that automatically instruments your Java 
 
 This means that you can adjust your sampling strategy during runtime without having to stop and restart your application. It adds a great deal of flexibility to your observability strategy and can help you adapt to changing system dynamics or diagnostic needs.
 
-#### Filtering
-
 ## Usage
 
 There are basically three ways of configuring the agent. Either you use a file based configuration, a service based or both. 
@@ -46,6 +44,7 @@ A typical use case would be to set up a file based configuration while pointing 
 serviceName: my-service-name
 sampler: parentbased_always_off
 sampleRatio: 0.1
+readOnly: false
 rules:
   - exclude:
     - http.target: "/agent-configuration/.+"
@@ -55,7 +54,7 @@ rules:
 ```
 
 
-Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used.
+Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used. The configuration must explicitly set to `readOnly: false` in order to use the REST API to change the configuration. The default value is `true`.
 
 ## Local testing
 

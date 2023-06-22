@@ -42,6 +42,9 @@ public class AgentConfiguration {
     @JsonProperty("sampleRatio")
     private Double sampleRatio = 0.0;
 
+    @JsonProperty("readOnly")
+    private boolean readOnly = true;
+
     @JsonProperty("rules")
     private List<Rule> rules;
 
@@ -163,6 +166,14 @@ public class AgentConfiguration {
         ruleSets.put("include", includeSet);
 
         return ruleSets;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 
     public String toString() {

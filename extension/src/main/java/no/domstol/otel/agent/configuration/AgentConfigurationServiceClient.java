@@ -21,8 +21,11 @@ import org.apache.http.util.EntityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 
 /**
+ * This type will connect to the OpenTelemetry Configuration Service and if
+ * possible return an {@link AgentConfiguration} for use in the {@link Sampler}.
  *
  * @since 1.0
  */
@@ -35,19 +38,18 @@ public class AgentConfigurationServiceClient {
     /**
      * Calls the configuration service to obtain a sampler configuration for this
      * agent. If the agent is not registered or obtaining a configuration fails, the
-     * default configuration will be returned.
+     * initial configuration will be returned.
      *
-     * @param config
+     * @param initialConfig Initial agent configuration
+     * @param otelConfig    OpenTelemetry configuration
      *
      * @return the agent configuration
-     * @see AgentConfiguration
      */
-    public AgentConfiguration getDynamicConfiguration(AgentConfiguration configuration, ConfigProperties config) {
-        // Use the fallback service name if none have been specified
-        String configurationServiceUrl = config.getString("otel.configuration.service.url", "http://localhost:8080");
+    public AgentConfiguration getDynamicConfiguration(AgentConfiguration initialConfig, ConfigProperties otelConfig) {
+        String configurationServiceUrl = otelConfig.getString("otel.configuration.service.url");
         try {
             HttpGet request = new HttpGet(
-                    configurationServiceUrl + "/agent-configuration/" + configuration.getServiceName());
+                    configurationServiceUrl + "/agent-configuration/" + initialConfig.getServiceName());
             request.addHeader("Accept", "application/json");
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -60,10 +62,10 @@ public class AgentConfigurationServiceClient {
             } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 try {
                     HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
-                    postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(configuration),
+                    postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(initialConfig),
                             ContentType.APPLICATION_JSON.withCharset("UTF-8")));
                     httpClient.execute(postRequest);
-                    logger.info("Self-registered as \"" + configuration.getServiceName()
+                    logger.info("Self-registered as \"" + initialConfig.getServiceName()
                             + "\" at the OTEL Configuration Service");
                 } catch (IOException e) {
                     logger.severe("Failed to self-register at the OTEL Configuration Service");
@@ -73,9 +75,9 @@ public class AgentConfigurationServiceClient {
             }
         } catch (IOException e) {
             logger.severe("Could not connect to OTEL Configuration Service at " + configurationServiceUrl
-                    + ", using sampler \"" + configuration.getSampler() + "\".");
+                    + ", using sampler \"" + initialConfig.getSampler() + "\".");
         }
-        return configuration;
+        return initialConfig;
     }
 
 }
