@@ -30,7 +30,6 @@ import no.domstol.otel.trace.samplers.SamplerMetrics;
 /**
  * This type will connect to the OpenTelemetry Configuration Service and if
  * possible return an {@link AgentConfiguration} for use in the {@link Sampler}.
- * TODO: Try with resources
  *
  * @since 1.0
  */
