@@ -1,5 +1,5 @@
 serviceName: da-otel-agent-service
-sampler: parentbased_always_off
+sampler: parentbased_always_on
 sampleRatio: 0.1
 readOnly: false
 rules:

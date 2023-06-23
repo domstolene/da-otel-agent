@@ -30,17 +30,19 @@ public class DynamicSamplerWrapper implements Sampler {
     private static final Logger logger = Logger.getLogger(DynamicSamplerWrapper.class.getName());
     private Sampler currentSampler;
     private Map<String, List<Map<AttributeKey<String>, Pattern>>> rules;
+    private SamplerMetrics metrics;
 
     public DynamicSamplerWrapper(Sampler initialSampler, Map<String, List<Map<AttributeKey<String>, Pattern>>> rules) {
         this.setCurrentSampler(initialSampler);
         this.setRules(rules);
+        metrics = new SamplerMetrics();
     }
 
     @Override
     public SamplingResult shouldSample(Context parentContext, String traceId, String name, SpanKind spanKind,
             Attributes attributes, List<LinkData> parentLinks) {
         try {
-
+            metrics.total_samples.incrementAndGet();
             // Include samples based on the rules provided
             List<Map<AttributeKey<String>, Pattern>> includes = rules.get("include");
             if (includes != null) {
@@ -56,6 +58,7 @@ public class DynamicSamplerWrapper implements Sampler {
                         }
                     }
                     if (include) {
+                        metrics.included_samples.incrementAndGet();
                         logger.fine("including sample because " + group);
                         return SamplingResult.create(SamplingDecision.RECORD_AND_SAMPLE);
                     }
@@ -76,6 +79,7 @@ public class DynamicSamplerWrapper implements Sampler {
                             }
                     }
                     if (exclude) {
+                        metrics.excluded_samples.incrementAndGet();
                         logger.fine("Dropping sample because " + group);
                         return SamplingResult.create(SamplingDecision.DROP);
                     }
@@ -85,7 +89,14 @@ public class DynamicSamplerWrapper implements Sampler {
             e.printStackTrace();
             logger.severe(e.getMessage());
         }
-        return getCurrentSampler().shouldSample(parentContext, traceId, name, spanKind, attributes, parentLinks);
+        SamplingResult shouldSample = getCurrentSampler().shouldSample(parentContext, traceId, name, spanKind,
+                attributes, parentLinks);
+        if (shouldSample.getDecision().equals(SamplingDecision.DROP)) {
+            getMetrics().dropped_samples.incrementAndGet();
+        } else if (shouldSample.getDecision().equals(SamplingDecision.RECORD_AND_SAMPLE)) {
+            getMetrics().recorded_samples.incrementAndGet();
+        }
+        return shouldSample;
     }
 
     @Override
@@ -103,6 +114,10 @@ public class DynamicSamplerWrapper implements Sampler {
 
     public void setRules(Map<String, List<Map<AttributeKey<String>, Pattern>>> rules) {
         this.rules = rules;
+    }
+
+    public SamplerMetrics getMetrics() {
+        return metrics;
     }
 
 }
