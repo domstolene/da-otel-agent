@@ -82,7 +82,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             configuration = client.synchronize(configuration, config, null);
             wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
             executor = Executors.newScheduledThreadPool(1);
-            executor.scheduleWithFixedDelay(DynamicSamplerProvider::updateConfigurationFromService, 5, 5,
+            executor.scheduleWithFixedDelay(DynamicSamplerProvider::updateConfigurationFromService, 5, 30,
                     TimeUnit.SECONDS);
         }
         return wrapper;
