@@ -1,7 +1,5 @@
 package no.domstol.otel.agent.service;
 
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Tag;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 
 @RestController
 @RequestMapping("/metrics")
 public class MetricsController {
 
+    private static final String TAG_NAME = "otel.service.name";
     private final PrometheusMeterRegistry registry;
     private boolean registered;
 
@@ -26,20 +24,20 @@ public class MetricsController {
         this.registry = prometheusMeterRegistry;
     }
 
-    private void registerCounters(String agentName) {
-        Counter.builder("otel_agents_recorded_samples").tag("agent", agentName)
+    private void registerCounters(String serviceName) {
+        Counter.builder("otel_agents_recorded_samples").tag(TAG_NAME, serviceName)
                 .description("the number of samples recorded by the underlying sampler").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_dropped_samples").tag("agent", agentName)
+        Counter.builder("otel_agents_dropped_samples").tag(TAG_NAME, serviceName)
                 .description("the number of samples dropped by the underlying sampler").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_excluded_samples").tag("agent", agentName)
+        Counter.builder("otel_agents_excluded_samples").tag(TAG_NAME, serviceName)
                 .description("the number of samples recorded due to filtering rules ").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_included_samples").tag("agent", agentName)
+        Counter.builder("otel_agents_included_samples").tag(TAG_NAME, serviceName)
                 .description("the number of samples dropped due to filtering rules").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_total_samples").tag("agent", agentName)
+        Counter.builder("otel_agents_total_samples").tag(TAG_NAME, serviceName)
                 .description("the total number of samples processed")
                 .baseUnit("samples").register(registry);
     }
@@ -49,33 +47,24 @@ public class MetricsController {
         return registry.scrape();
     }
 
-    @PostMapping("{agentName}")
-    public ResponseEntity<String> handleRequest(@PathVariable String agentName, @RequestBody SamplerMetrics metrics) {
+    @PostMapping("{serviceName}")
+    public ResponseEntity<String> handleRequest(@PathVariable String serviceName, @RequestBody SamplerMetrics metrics) {
+        // must be done first or the registry will get confused and hide metrics.
         if (registered == false) {
-            registerCounters(agentName);
+            registerCounters(serviceName);
             registered = true;
         }
-        registry.counter("otel_agents_recorded_samples", "agent", agentName)
+        registry.counter("otel_agents_recorded_samples", TAG_NAME, serviceName)
                 .increment(metrics.recorded_samples.doubleValue());
-        registry.counter("otel_agents_dropped_samples", "agent", agentName)
+        registry.counter("otel_agents_dropped_samples", TAG_NAME, serviceName)
                 .increment(metrics.dropped_samples.doubleValue());
-        registry.counter("otel_agents_excluded_samples", "agent", agentName)
+        registry.counter("otel_agents_excluded_samples", TAG_NAME, serviceName)
                 .increment(metrics.excluded_samples.doubleValue());
-        registry.counter("otel_agents_included_samples", "agent", agentName)
+        registry.counter("otel_agents_included_samples", TAG_NAME, serviceName)
                 .increment(metrics.included_samples.doubleValue());
-        registry.counter("otel_agents_total_samples", "agent", agentName)
+        registry.counter("otel_agents_total_samples", TAG_NAME, serviceName)
                 .increment(metrics.total_samples.doubleValue());
         return ResponseEntity.ok("Success");
     }
 
-    public boolean findCounterByTag(String counterName, String tagName, String tagValue) {
-        Counter counter = registry.find(counterName).counter();
-        List<Tag> tags = counter.getId().getTags();
-        for (Tag tag : tags) {
-            if (tag.getKey().equals(tagName) && tag.getValue().equals(tagValue)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
