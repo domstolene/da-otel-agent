@@ -1,23 +1,25 @@
 
 # DA OpenTelemetry Agent and Configuration Service
 
-This project includes a web service with a Representational State Transfer (REST) Application Programming Interface (API). The web service is designed to manage OpenTelemetry Sampler Configurations.
+This project contains an OpenTelemetry Agent and a accompanying configuration service.
 
-## Motivation
+By creating a remotely controlled agent, we can dynamically change its behavior based on the current needs. For example, we could adjust sampling rates, enable or disable certain types of telemetry, or update configuration settings, all without having to redeploy or restart our applications, which would normally be the case.
 
-By creating a remotely controlled agent, we can dynamically change its behavior based on the current needs. For example, we could adjust sampling rates, enable or disable certain types of telemetry, or update configuration settings, all without having to redeploy or restart our applications.
 
-## Components
+## The Configuration Service
 
-### OpenTelemetry Configuration Service
+The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API provides a programmatic interface to the service, allowing software clients to interact with the service.
 
-The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different sampler configurations. The sampler is a part of the OpenTelemetry SDK that determines whether a given span should be sampled and processed further. The configurations define the conditions under which a span is considered for sampling.
+While the sampler is working the following metrics are collected and exposed on the Prometheus compatible endpoint `/metrics`:
 
-This service exposes a RESTful API that allows clients to interact with it. The API provides a programmatic interface to the service, allowing software clients to interact with the service.
+* the total number of samples processed
+* the number of samples recorded by the underlying sampler
+* the number of samples dropped due to filtering rules
+* the number of samples dropped by the underlying sampler
+* the number of samples recorded due to filtering rules
 
-You can use HTTP methods like `GET`, `POST`, `PUT`, `DELETE`, etc., to interact with the service via the REST API. For instance, you can retrieve current configurations, create new configurations, update existing ones, or delete configurations.
 
-### OpenTelemetry Java Agent Extension
+## The Java Agent Extension
 
 The project also includes an extension to the standard OpenTelemetry Java agent. This extension enables the Java agent to dynamically change the sampler implementation and its configuration.
 
@@ -36,6 +38,8 @@ rules:
   - exclude:
     - http.target: "/health/.+"
       http.method: "GET"
+    - http.target: "/metrics"
+      http.method: "GET"
   - include:
     - http.method: "POST"
 ```
@@ -52,14 +56,15 @@ A typical use case would be to set up a file based configuration while pointing 
 
 ```shell
   -javaagent:da-opentelemetry-javaagent.jar \
+  -Dotel.service.name="my-service" \
   -Dotel.traces.sampler="dynamic" \
   -Dotel.configuration.service.file="otel-configuration-file.yaml" \
   -Dotel.configuration.service.url="http://otel-configuration-service.test" \
 ```
 
 ```yaml
-serviceName: my-service-name
-sampler: parentbased_always_off
+serviceName: my-service
+sampler: parentbased_traceidratio
 sampleRatio: 0.1
 readOnly: false
 rules:
@@ -75,7 +80,7 @@ Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sam
 
 ## Local testing
 
-In order to test this setup, first start a Jaeger instance by calling `jaeger.sh` found in the root folder. This will start a new instance in Docker and expose ports 4317 and 16686. Having another instance at `localhost` with the same ports exposed is also fine.
+In order to test this setup, first start Jaeger and Prometheys by calling `docker compose up` found in the root folder. This will start a new Jaeger instance in Docker and expose port 4317 for tracing and <a href="http://localhost:16686">http://localhost:16686</a> for the UI. Prometheus will be available at <a href="http://localhost:9090">http://localhost:9090</a>
 
 Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service using the built agent.
 
@@ -83,7 +88,7 @@ Since the configuration service is not started when it's being instrumented, obt
 
 ```
 opentelemetry-javaagent - version: 1.27.0-SNAPSHOT
-Could not connect to OTEL Configuration Service at http://localhost:8080, using default sampler "always_off".
+Could not connect to OTEL Configuration Service at http://localhost:8080, using sampler "parentbased_always_on".
 ```
 
 If the OpenTelemetry Configuration Service is available, but does not contain a configuration for the agent, the agent will register itself. You can see this in the log as:
@@ -119,4 +124,4 @@ The `DynamicSamplerProvicder` in the _OpenTelemetry Configuration Service_ will 
 Changing sampler to AlwaysOnSampler
 ```
 
-The `DynamicSamplerProvider` will poll the service at regular intervals (currently each 5s) to check for updated configurations. You should be able to see this in the Jaeger UI.
+The `DynamicSamplerProvider` will poll the service at regular intervals (currently each 30s) to check for updated configurations. You should be able to see this in the Jaeger UI.

@@ -30,8 +30,6 @@ import no.domstol.otel.agent.configuration.AgentConfigurationServiceClient;
  * <li>Read the configuration from a service if specified in
  * <code>otel.configuration.service.url</code></li>
  * <li>Periodically poll the service for an updated configuration</li>
- * <li>Read the configuration from the specified file, if the file has
- * changed</li>
  * </ol>
  *
  * In order to make use of this sampler provider, the agent must be configured
@@ -51,6 +49,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
     private static DynamicSamplerWrapper wrapper;
     private static ConfigProperties initialConfig;
     private static AgentConfiguration configuration = new AgentConfiguration();
+    private static ScheduledExecutorService executor;
 
     public DynamicSamplerProvider() {
     }
@@ -64,7 +63,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
         if (configurationServiceFile == null && configurationServiceUrl == null) {
             throw new IllegalArgumentException(
-                    "One of 'otel.configuration.service.file' and 'otel.configuration.service.url' must be specified");
+                    "One of 'otel.configuration.service.file' and 'otel.configuration.service.url' or both must be specified");
         }
 
         // read the configuration from a file if specified
@@ -80,23 +79,27 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
         // read the configuration from the service
         if (configurationServiceUrl != null) {
-            configuration = client.getDynamicConfiguration(configuration, config);
+            configuration = client.synchronize(configuration, config, null);
             wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
-            // periodically poll the service for an updated configuration
-            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-            executor.scheduleAtFixedRate(DynamicSamplerProvider::updateConfigurationFromService, 5, 5, TimeUnit.SECONDS);
+            executor = Executors.newScheduledThreadPool(1);
+            executor.scheduleWithFixedDelay(DynamicSamplerProvider::updateConfigurationFromService, 5, 30,
+                    TimeUnit.SECONDS);
         }
         return wrapper;
     }
 
     private static void updateConfigurationFromService() {
-        AgentConfiguration newConfiguration = client.getDynamicConfiguration(configuration, initialConfig);
+        try {
+        AgentConfiguration newConfiguration = client.synchronize(configuration, initialConfig, wrapper.getMetrics());
         if (!newConfiguration.equals(configuration)) {
             logger.info("Changing configuration and sampler to " + newConfiguration.getSampler());
             wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
             wrapper.setRules(newConfiguration.getRules());
             configuration = newConfiguration;
         }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
     }
 
     private static Sampler getConfiguredSampler(AgentConfiguration configuration) {
