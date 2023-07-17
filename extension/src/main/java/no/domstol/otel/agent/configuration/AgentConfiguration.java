@@ -50,6 +50,7 @@ public class AgentConfiguration {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Rule {
+
         @JsonProperty("exclude")
         private List<Map<String, String>> exclude;
 

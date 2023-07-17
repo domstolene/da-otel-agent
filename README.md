@@ -1,35 +1,21 @@
 
-# DA OpenTelemetry Agent and Configuration Service
+# DA OpenTelemetry Agent
 
-This project contains an OpenTelemetry Agent and a accompanying configuration service.
+This project delivers an [OpenTelemetry Java Agent](https://opentelemetry.io/docs/instrumentation/java/automatic/) including a remotely configurable [sampler](https://opentelemetry.io/docs/concepts/sampling/), along with the accompanying REST service for configuring it. 
 
-By creating a remotely controlled agent, we can dynamically change its behavior based on the current needs. For example, we could adjust sampling rates, enable or disable certain types of telemetry, or update configuration settings, all without having to redeploy or restart our applications, which would normally be the case.
+By utilizing a remotely controlled sampler, we can dynamically change its behavior based on the current needs. For example, we could adjust sampling rates or rules, all without having to redeploy or restart our applications – which would normally be the case. If remote control is not desirable, the agent configuration can be set to _read only_. This will still expose the configuration to the service along with any metrics collected. This allowing you to for example. get an idea of how many spans _would be_ sampled if the sampler was set to `always_on`.
 
-
-## The Configuration Service
-
-The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API provides a programmatic interface to the service, allowing software clients to interact with the service.
-
-While the sampler is working the following metrics are collected and exposed on the Prometheus compatible endpoint `/metrics`:
-
-* the total number of samples processed
-* the number of samples recorded by the underlying sampler
-* the number of samples dropped due to filtering rules
-* the number of samples dropped by the underlying sampler
-* the number of samples recorded due to filtering rules
-
+The sampler is implemented as an [extension](https://opentelemetry.io/docs/instrumentation/java/automatic/extensions/) to the agent and made use of in a way that allows you to simply replace the existing `opentelemetry-javaagent.jar` with `da-opentelemetry-javaagent.jar`. Existing configurations can be used as is, and making use of the `dynamic` sampler is optional.
 
 ## The Java Agent Extension
 
-The project also includes an extension to the standard OpenTelemetry Java agent. This extension enables the Java agent to dynamically change the sampler implementation and its configuration.
+The agent extension enhances the standard OTEL Java agent's capabilities by allowing it to switch between different [sampler implementations](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md#sampler) and their configurations on the fly. This is enabled by making use of the `dynamic` sampler which delegates the sampling decisions to one of the available implementations. In addition the dynamic sampler includes a basic filtering mechanism that allows spans to be created or discarded based on a simple set of rules.
 
-The OpenTelemetry Java agent is a tool that automatically instruments your Java application to track transactions and report metrics. Our extension enhances this agent's capabilities by allowing it to switch between different sampler implementations and configurations on the fly. It also includes a basic filtering mechanism that allows samples to be ignored or accepted based on a simple set of rules.
+This means that you can adjust your sampling strategy during runtime without having to stop and restart your application. It adds a great deal of flexibility to your observability strategy and can help you adapt to changing diagnostic needs.
 
-This means that you can adjust your sampling strategy during runtime without having to stop and restart your application. It adds a great deal of flexibility to your observability strategy and can help you adapt to changing system dynamics or diagnostic needs.
+### Filtering
 
-#### Filtering
-
-The `dynamic` sampler coming with the agent extension has an optional filtering mechanism. This applies filtering *before* the underlying sampler recieves the data. And can be used to force exclusion or inclusion of a span. Note that inclusion takes precedence.
+The filtering mechanism is applied *before* the underlying sampler recieves its data. It can be used to determine whether or not a span should be created. Note that inclusion takes precedence.
 
 OTEL can automatically add certain pieces of metadata, or "tags", to each piece of data it collects. For HTTP requests, this might include things like the target URL of the request (http.target), or the HTTP method used (http.method). These tags are what is used for the filtering. For example:
 
@@ -44,13 +30,33 @@ rules:
     - http.method: "POST"
 ```
 
-In this example all HTTP GET calls to the health endpoint are ignored, while all POST calls are sampled. If the tags does not match any of these configurations, it is up to the underlying sampler to determine whether or not the span should be included.
+In this example all HTTP `GET` calls to the health endpoint are ignored, while all `POST` calls are sampled. If the tags does not match any of these configurations, it is up to the underlying sampler to determine whether or not the span should be created.
+
+More than one tag can be specified in each rule, and all must match for the rule to trigger. Also notice that Java regular expressions can be used.
+
+## The Configuration Service
+
+The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API supports all the common REST verbs except `PATCH`. The endpoints are as follows:
+
+* `POST` `/agent-configuration` – Posts a _new_ agent configuration
+* `GET` `/agent-configuration/<id>` – Returns an agent configuration or 404 if not found.
+* `PUT` `/agent-configuration/<id>` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_.
+* `DELETE` `/agent-configuration/<id>` – Deletes the agent configuration.
+* `GET` `/agent-configuration` – Returns all agent configurations.
+
+While the dynamic sampler is working, the following metrics are collected and exposed on the [Prometheus](https://prometheus.io) compatible endpoint `/metrics`. For each of the configured services, the following metrics are collected:
+
+* the total number of samples processed
+* the number of samples recorded by the underlying sampler
+* the number of samples dropped due to filtering rules
+* the number of samples dropped by the underlying sampler
+* the number of samples recorded due to filtering rules
 
 ## Usage
 
-There are basically three ways of configuring the agent. Either you use a file based configuration, a service based or both. 
+There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both. 
 
-A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will then connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this.
+A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this version.
 
 ### Example configuration
 
@@ -76,13 +82,13 @@ rules:
 ```
 
 
-Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used. The configuration must explicitly set to `readOnly: false` in order to use the REST API to change the configuration. The default value is `true`.
+Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used. While the `sampler` entry in the configuration file points to the actual implementation. The configuration must explicitly set to `readOnly: false` in order to use the REST API to change the configuration. The default value is `true`.
 
 ## Local testing
 
 In order to test this setup, first start Jaeger and Prometheys by calling `docker compose up` found in the root folder. This will start a new Jaeger instance in Docker and expose port 4317 for tracing and <a href="http://localhost:16686">http://localhost:16686</a> for the UI. Prometheus will be available at <a href="http://localhost:9090">http://localhost:9090</a>
 
-Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service using the built agent.
+Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service instrumented using the built agent.
 
 Since the configuration service is not started when it's being instrumented, obtaining the remote configuration will fail and defaults will be used. You will see something like this in the log:
 
@@ -97,15 +103,15 @@ If the OpenTelemetry Configuration Service is available, but does not contain a 
 Self-registered as "da-otel-agent-service" at the OTEL Configuration Service
 ```
 
-Now getting the available configurations from the service will yield:
+Now getting the available configurations from the service will a JSON array with all the agent configurations:
 
 ```
 curl -s -X GET http://localhost:8080/agent-configuration | jq
 [
   {
     "serviceName": "da-otel-agent-service",
-    "sampleRatio": 0,
-    "sampler": "always_off"
+    "sampleRatio": 0.1,
+    "sampler": "parentbased_always_on"
   }
 ]
 ```
@@ -118,7 +124,7 @@ curl -X POST http://localhost:8080/agent-configuration \
   -d '{"serviceName":"da-otel-agent-service", "sampler":"always_on"}'
 ```
 
-The `DynamicSamplerProvicder` in the _OpenTelemetry Configuration Service_ will now respond with the following log message:
+The `DynamicSamplerProvider` in the _OpenTelemetry Configuration Service_ will now respond with the following log message:
 
 ```
 Changing sampler to AlwaysOnSampler

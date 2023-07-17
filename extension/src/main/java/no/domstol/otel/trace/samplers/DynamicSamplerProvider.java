@@ -29,6 +29,7 @@ import no.domstol.otel.agent.configuration.AgentConfigurationServiceClient;
  * <code>otel.configuration.service.file</code></li>
  * <li>Read the configuration from a service if specified in
  * <code>otel.configuration.service.url</code></li>
+ * <li>Upload the current configuration if not found in the service</li>
  * <li>Periodically poll the service for an updated configuration</li>
  * </ol>
  *

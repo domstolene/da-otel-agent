@@ -66,11 +66,13 @@ public class AgentConfigurationController {
 
     @PutMapping("/agent-configuration")
     public void editAgentConfiguration(@RequestBody AgentConfiguration configuration) {
+        // TODO: Fix 404 or 403
         getConfigurations().put(configuration.getServiceName(), configuration);
     }
 
     @DeleteMapping("/agent-configuration/{agentName}")
     public void deleteAgentConfiguration(@PathVariable String agentName) {
+        // TODO: Return 403 if readOnly and 404 if not found
         getConfigurations().remove(agentName);
     }
 
