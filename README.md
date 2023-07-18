@@ -52,6 +52,8 @@ While the dynamic sampler is working, the following metrics are collected and ex
 * the number of samples dropped by the underlying sampler
 * the number of samples recorded due to filtering rules
 
+Note that the current implementation of the service does _not_ persist agent configurations or metrics. If the service is restarted everything will be lost, however data should be available again once the agents report their configurations and metrics. This may take up to 30 seconds.
+
 ## Usage
 
 There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both. 
@@ -82,11 +84,11 @@ rules:
 ```
 
 
-Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used. While the `sampler` entry in the configuration file points to the actual implementation. The configuration must explicitly set to `readOnly: false` in order to use the REST API to change the configuration. The default value is `true`.
+Notice that `otel.traces.sampler` must be set to `dynamic` in order for this sampler to be used. While the `sampler` entry in the configuration file points to the actual implementation. The configuration must explicitly set to `readOnly: false` in order for the servuceto change the configuration. The default value is `true`.
 
 ## Local testing
 
-In order to test this setup, first start Jaeger and Prometheys by calling `docker compose up` found in the root folder. This will start a new Jaeger instance in Docker and expose port 4317 for tracing and <a href="http://localhost:16686">http://localhost:16686</a> for the UI. Prometheus will be available at <a href="http://localhost:9090">http://localhost:9090</a>
+In order to test this setup, first start Jaeger and Prometheus by calling `docker compose up` found in the root folder. This will start a new Jaeger instance in Docker and expose port 4317 for tracing and <a href="http://localhost:16686">http://localhost:16686</a> for the UI. The Prometheus UI will be available at <a href="http://localhost:9090">http://localhost:9090</a>
 
 Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service instrumented using the built agent.
 
@@ -94,7 +96,8 @@ Since the configuration service is not started when it's being instrumented, obt
 
 ```
 opentelemetry-javaagent - version: 1.27.0-SNAPSHOT
-Could not connect to OTEL Configuration Service at http://localhost:8080, using sampler "parentbased_always_on".
+Could not connect to OTEL Configuration Service at http://localhost:8080,
+using sampler "parentbased_always_on".
 ```
 
 If the OpenTelemetry Configuration Service is available, but does not contain a configuration for the agent, the agent will register itself. You can see this in the log as:
