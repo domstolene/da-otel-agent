@@ -23,6 +23,25 @@ import io.opentelemetry.api.common.AttributeKey;
 
 public class AgentConfigurationTest {
 
+    private String json = """
+            {
+              "serviceName" : "da-otel-agent-service",
+              "sampler" : "parentbased_always_on",
+              "sampleRatio" : 0.1,
+              "readOnly" : false,
+              "rules" : [ {
+                "exclude" : [ {
+                  "http.target" : "/agent-configuration/.+",
+                  "http.method" : "GET"
+                } ]
+              }, {
+                "include" : [ {
+                  "http.method" : "POST"
+                } ]
+              } ]
+            }
+            """.trim();
+
     @Test
     public void testSetAndGetServiceName() {
         AgentConfiguration config = new AgentConfiguration();
@@ -54,6 +73,14 @@ public class AgentConfigurationTest {
 
         assertFalse(rules.get("include").isEmpty());
         assertFalse(rules.get("exclude").isEmpty());
+    }
+
+    @Test
+    public void testSerializeToJSON() throws StreamReadException, DatabindException, IOException {
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        Path file = Paths.get("src", "test", "resources", "traces-configuration.yaml");
+        AgentConfiguration configuration = yamlMapper.readValue(file.toFile(), AgentConfiguration.class);
+        assertTrue(json.equals(configuration.toString()));
     }
 
     @Test
