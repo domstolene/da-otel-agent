@@ -46,10 +46,10 @@ public class AgentConfiguration {
     private boolean readOnly = true;
 
     @JsonProperty("rules")
-    private List<Rule> rules;
+    private List<Rules> rules;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class Rule {
+    public static class Rules {
 
         @JsonProperty("exclude")
         private List<Map<String, String>> exclude;
@@ -81,7 +81,7 @@ public class AgentConfiguration {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            Rule other = (Rule) obj;
+            Rules other = (Rules) obj;
             return Objects.equals(exclude, other.exclude) && Objects.equals(include, other.include);
         }
 
@@ -133,40 +133,32 @@ public class AgentConfiguration {
             return ruleSets;
         }
 
-        Rule rule = rules.get(0);
-        // deal with the excludes
         List<Map<AttributeKey<String>, Pattern>> excludeSet = new ArrayList<>();
-        List<Map<String, String>> exclude = rule.getExclude();
-        if (exclude != null) {
-            for (Map<String, String> map : exclude) {
-                Map<AttributeKey<String>, Pattern> ruleGroup = new HashMap<AttributeKey<String>, Pattern>();
-                for (String string : map.keySet()) {
-                    if (map.get(string) instanceof String) {
-                        ruleGroup.put(AttributeKey.stringKey(string), Pattern.compile(map.get(string)));
-                    }
-                }
-                excludeSet.add(ruleGroup);
-            }
-        }
-        ruleSets.put("exclude", excludeSet);
-
-        // deal with the includes
         List<Map<AttributeKey<String>, Pattern>> includeSet = new ArrayList<>();
-        List<Map<String, String>> include = rule.getInclude();
-        if (include != null) {
-            for (Map<String, String> map : include) {
-                Map<AttributeKey<String>, Pattern> ruleGroup = new HashMap<AttributeKey<String>, Pattern>();
-                for (String string : map.keySet()) {
-                    if (map.get(string) instanceof String) {
-                        ruleGroup.put(AttributeKey.stringKey(string), Pattern.compile(map.get(string)));
-                    }
-                }
-                includeSet.add(ruleGroup);
-            }
+
+        for (Rules rule : rules) {
+            compileRules(excludeSet, rule.getExclude());
+            compileRules(includeSet, rule.getInclude());
         }
+
+        ruleSets.put("exclude", excludeSet);
         ruleSets.put("include", includeSet);
 
         return ruleSets;
+    }
+
+    private void compileRules(List<Map<AttributeKey<String>, Pattern>> set, List<Map<String, String>> spec) {
+        if (spec != null) {
+            for (Map<String, String> map : spec) {
+                Map<AttributeKey<String>, Pattern> ruleGroup = new HashMap<AttributeKey<String>, Pattern>();
+                for (String string : map.keySet()) {
+                    if (map.get(string) instanceof String) {
+                        ruleGroup.put(AttributeKey.stringKey(string), Pattern.compile(map.get(string)));
+                    }
+                }
+                set.add(ruleGroup);
+            }
+        }
     }
 
     public boolean isReadOnly() {
