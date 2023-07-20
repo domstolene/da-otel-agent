@@ -5,6 +5,14 @@
 package no.domstol.otel.trace.samplers;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,11 +54,66 @@ import no.domstol.otel.agent.configuration.AgentConfigurationServiceClient;
 public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
     private static final Logger logger = Logger.getLogger(DynamicSamplerProvider.class.getName());
-    private static AgentConfigurationServiceClient client = new AgentConfigurationServiceClient();
+    private static AgentConfigurationServiceClient remoteConfigReader = new AgentConfigurationServiceClient();
+    private static ConfigurationFileReader localConfigReader;
     private static DynamicSamplerWrapper wrapper;
     private static ConfigProperties initialConfig;
     private static AgentConfiguration configuration = new AgentConfiguration();
     private static ScheduledExecutorService executor;
+
+    private class ConfigurationFileReader extends Thread {
+        private WatchService watchService;
+        private Path path;
+
+        public ConfigurationFileReader(String configurationServiceFile) {
+            try {
+                path = Paths.get(configurationServiceFile);
+                watchService = FileSystems.getDefault().newWatchService();
+                path.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+                this.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            Boolean poll = true;
+            while (poll) {
+                try {
+                    poll = pollEvents(watchService);
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        protected boolean pollEvents(WatchService watchService) throws InterruptedException {
+            WatchKey key = watchService.take();
+            for (WatchEvent<?> event : key.pollEvents()) {
+                @SuppressWarnings("unchecked")
+                WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                if (ev.context().equals(path.getFileName())) {
+                    updateConfigurationFromFile();
+                }
+            }
+            return key.reset();
+        }
+
+        private AgentConfiguration readConfigurationFile() {
+            logger.info("Loading OTEL Agent configuration from " + path);
+            try {
+                ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+                AgentConfiguration configuration = mapper.readValue(path.toFile(), AgentConfiguration.class);
+                return configuration;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+    }
 
     public DynamicSamplerProvider() {
     }
@@ -64,7 +127,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
         if (configurationServiceFile == null && configurationServiceUrl == null) {
             throw new IllegalArgumentException(
-                    "One of 'otel.configuration.service.file' and 'otel.configuration.service.url' or both must be specified");
+                    "At least one of 'otel.configuration.service.file' and 'otel.configuration.service.url' must be specified");
         }
 
         // read the configuration from a file if specified
@@ -73,14 +136,14 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             if (!file.exists()) {
                 logger.severe("The specified configuration file '" + file + "' does not exist!");
             }
-            logger.info("Loading OTEL Agent configuration from " + file);
-            configuration = readConfigurationFile(file);
+            localConfigReader = new ConfigurationFileReader(configurationServiceFile);
+            configuration = localConfigReader.readConfigurationFile();
             wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
         }
 
-        // read the configuration from the service
+        // read the configuration from the service if specified
         if (configurationServiceUrl != null) {
-            configuration = client.synchronize(configuration, config, null);
+            configuration = remoteConfigReader.synchronize(configuration, config, null);
             wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
             executor = Executors.newScheduledThreadPool(1);
             executor.scheduleWithFixedDelay(DynamicSamplerProvider::updateConfigurationFromService, 5, 30,
@@ -91,16 +154,32 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
     private static void updateConfigurationFromService() {
         try {
-        AgentConfiguration newConfiguration = client.synchronize(configuration, initialConfig, wrapper.getMetrics());
-        if (!newConfiguration.equals(configuration)) {
-            logger.info("Changing configuration and sampler to " + newConfiguration.getSampler());
-            wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
-            wrapper.setRules(newConfiguration.getRules());
-            configuration = newConfiguration;
+            AgentConfiguration newConfiguration = remoteConfigReader.synchronize(configuration, initialConfig,
+                    wrapper.getMetrics());
+            if (!newConfiguration.equals(configuration)) {
+                logger.info("Changing configuration and sampler to " + newConfiguration.getSampler());
+                wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
+                wrapper.setRules(newConfiguration.getRules());
+                configuration = newConfiguration;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
     }
+
+    private static void updateConfigurationFromFile() {
+        try {
+            AgentConfiguration newConfiguration = localConfigReader.readConfigurationFile();
+            ;
+            if (!newConfiguration.equals(configuration)) {
+                logger.info("Changing configuration and sampler to " + newConfiguration.getSampler());
+                wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
+                wrapper.setRules(newConfiguration.getRules());
+                configuration = newConfiguration;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static Sampler getConfiguredSampler(AgentConfiguration configuration) {
@@ -130,17 +209,6 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             break;
         }
         return configuredSampler;
-    }
-
-    private AgentConfiguration readConfigurationFile(File file) {
-        try {
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            AgentConfiguration configuration = mapper.readValue(file, AgentConfiguration.class);
-            return configuration;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override

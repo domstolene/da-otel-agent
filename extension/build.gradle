@@ -57,37 +57,43 @@ dependencies {
   implementation(platform("io.opentelemetry:opentelemetry-bom:${versions.opentelemetrySdk}"))
 
   /*
-  Interfaces and SPIs that we implement. We use `compileOnly` dependency because during
-  runtime all necessary classes are provided by javaagent itself.
+    Interfaces and SPIs that we implement. We use `compileOnly` dependency
+    because during runtime all necessary classes are provided by javaagent
+    itself.
    */
   compileOnly 'io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi'
   compileOnly 'io.opentelemetry:opentelemetry-exporter-otlp'
-  //compileOnly 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-api'
-  //compileOnly 'io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api'
 
-  //Provides @AutoService annotation that makes registration of our SPI implementations much easier
+  /*
+    Provides @AutoService annotation that makes registration of our SPI
+    implementations much easier.
+  */
   compileOnly deps.autoservice
   annotationProcessor deps.autoservice
 
   /*
-  These dependencies are required both during compile and runtime.
+    These dependencies are required both during compile and runtime.
   */
   implementation 'org.apache.commons:commons-lang3:3.12.0'
   implementation 'org.apache.httpcomponents:httpclient:4.5.14'
   implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
   implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
+  /*
+  For tests
+  */
   testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+  testImplementation 'io.opentelemetry:opentelemetry-api:${versions.opentelemetrySdk}'
 
 
-  //Otel Java instrumentation that we use and extend during integration tests
+  // Otel Java instrumentation that we use and extend during integration tests
   otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
-
-  //TODO remove when start using io.opentelemetry.instrumentation.javaagent-instrumentation plugin
-  //add("codegen", "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${versions.opentelemetryJavaagentAlpha}")
 }
 
-//Produces a copy of upstream javaagent with this extension jar included inside it
-//The location of extension directory inside agent jar is hard-coded in the agent source code
+/*
+  Produces a copy of upstream javaagent with this extension jar included inside
+  it. The location of extension directory inside agent jar is hard-coded in the
+  agent source code
+*/
 task extendedAgent(type: Jar) {
   dependsOn(configurations.otel)
   archiveFileName = "da-opentelemetry-javaagent.jar"
