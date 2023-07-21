@@ -38,9 +38,10 @@ More than one tag can be specified in each rule, and all must match for the rule
 
 The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API supports all the common REST verbs except `PATCH`. The endpoints are as follows:
 
-* `POST` `/agent-configuration` – Posts a _new_ agent configuration
+* `POST` `/agent-configuration` – Posts a _new_ agent configuration. The configuration must be in the payload.
 * `GET` `/agent-configuration/<id>` – Returns an agent configuration or 404 if not found.
-* `PUT` `/agent-configuration/<id>` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_.
+* `PUT` `/agent-configuration/<id>` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
+* `PUT` `/agent-configuration` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
 * `DELETE` `/agent-configuration/<id>` – Deletes the agent configuration.
 * `GET` `/agent-configuration` – Returns all agent configurations.
 
