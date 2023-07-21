@@ -28,13 +28,13 @@ import io.opentelemetry.sdk.trace.samplers.Sampler;
 import no.domstol.otel.trace.samplers.SamplerMetrics;
 
 /**
- * This type will connect to the OpenTelemetry Configuration Service and if
- * possible return an {@link AgentConfiguration} for use in the {@link Sampler}.
+ * This type deals with the OpenTelemetry Configuration Service.
  *
  * @since 1.0
  */
 public class AgentConfigurationServiceClient {
 
+    private static final String API_KEY_HEADER = "X-API-KEY";
     private static final Logger logger = Logger.getLogger(AgentConfigurationServiceClient.class.getName());
     private static final CloseableHttpClient httpClient = HttpClients.createDefault();
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -43,6 +43,10 @@ public class AgentConfigurationServiceClient {
      * Calls the configuration service to obtain a sampler configuration for this
      * agent. If the agent is not registered or obtaining a configuration fails, the
      * initial configuration will be returned.
+     * <p>
+     * If the configuration service contains the agent configuration, collected
+     * {@link Sampler} metrics for this will be posted.
+     * </p>
      *
      * @param initialConfig Initial agent configuration
      * @param otelConfig    OpenTelemetry configuration
@@ -53,10 +57,13 @@ public class AgentConfigurationServiceClient {
     public AgentConfiguration synchronize(AgentConfiguration initialConfig, ConfigProperties otelConfig,
             SamplerMetrics metrics) {
         String configurationServiceUrl = otelConfig.getString("otel.configuration.service.url");
+        String apiKey = otelConfig.getString("otel.configuration.service.api.key");
         try {
             HttpGet request = new HttpGet(
                     configurationServiceUrl + "/agent-configuration/" + initialConfig.getServiceName());
             request.addHeader("Accept", "application/json");
+            if (apiKey != null)
+                request.addHeader(API_KEY_HEADER, apiKey);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = response.getEntity();
@@ -64,13 +71,14 @@ public class AgentConfigurationServiceClient {
                         String result = EntityUtils.toString(entity);
                         AgentConfiguration agentConfiguration = objectMapper.readValue(result,
                                 AgentConfiguration.class);
-                        postMetrics(initialConfig.getServiceName(), configurationServiceUrl, metrics);
+                        postMetrics(initialConfig.getServiceName(), configurationServiceUrl, apiKey, metrics);
                         return agentConfiguration;
                     }
                 } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-                    selfRegister(initialConfig, configurationServiceUrl);
+                    selfRegister(initialConfig, configurationServiceUrl, apiKey);
                 } else {
-                    logger.severe("Error: " + response.getStatusLine().getStatusCode());
+                    logger.severe("Configuration service connection failed with status code: "
+                            + response.getStatusLine().getStatusCode());
                 }
             }
         } catch (Exception e) {
@@ -80,9 +88,11 @@ public class AgentConfigurationServiceClient {
         return initialConfig;
     }
 
-    private void selfRegister(AgentConfiguration initialConfig, String configurationServiceUrl)
+    private void selfRegister(AgentConfiguration initialConfig, String configurationServiceUrl, String apiKey)
             throws UnsupportedCharsetException, JsonProcessingException {
             HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
+            if (apiKey != null)
+                postRequest.addHeader(API_KEY_HEADER, apiKey);
             postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(initialConfig),
                     ContentType.APPLICATION_JSON.withCharset("UTF-8")));
             try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
@@ -98,9 +108,11 @@ public class AgentConfigurationServiceClient {
             }
     }
 
-    public void postMetrics(String serviceName, String configurationServiceUrl, SamplerMetrics metrics)
+    private void postMetrics(String serviceName, String configurationServiceUrl, String apiKey, SamplerMetrics metrics)
             throws UnsupportedCharsetException, ClientProtocolException, IOException {
         HttpPost postRequest = new HttpPost(configurationServiceUrl + "/metrics/" + serviceName);
+        if (apiKey != null)
+            postRequest.addHeader(API_KEY_HEADER, apiKey);
         postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(metrics.copyAndClear()),
                 ContentType.APPLICATION_JSON.withCharset("UTF-8")));
         try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
