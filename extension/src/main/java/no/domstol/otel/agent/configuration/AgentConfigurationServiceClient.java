@@ -59,7 +59,8 @@ public class AgentConfigurationServiceClient {
             HttpGet request = new HttpGet(
                     configurationServiceUrl + "/agent-configuration/" + initialConfig.getServiceName());
             request.addHeader("Accept", "application/json");
-            request.addHeader(API_KEY_HEADER, apiKey);
+            if (apiKey != null)
+                request.addHeader(API_KEY_HEADER, apiKey);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = response.getEntity();
@@ -87,7 +88,8 @@ public class AgentConfigurationServiceClient {
     private void selfRegister(AgentConfiguration initialConfig, String configurationServiceUrl, String apiKey)
             throws UnsupportedCharsetException, JsonProcessingException {
             HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
-            postRequest.addHeader(API_KEY_HEADER, apiKey);
+            if (apiKey != null)
+                postRequest.addHeader(API_KEY_HEADER, apiKey);
             postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(initialConfig),
                     ContentType.APPLICATION_JSON.withCharset("UTF-8")));
             try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
@@ -106,7 +108,8 @@ public class AgentConfigurationServiceClient {
     public void postMetrics(String serviceName, String configurationServiceUrl, String apiKey, SamplerMetrics metrics)
             throws UnsupportedCharsetException, ClientProtocolException, IOException {
         HttpPost postRequest = new HttpPost(configurationServiceUrl + "/metrics/" + serviceName);
-        postRequest.addHeader(API_KEY_HEADER, apiKey);
+        if (apiKey != null)
+            postRequest.addHeader(API_KEY_HEADER, apiKey);
         postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(metrics.copyAndClear()),
                 ContentType.APPLICATION_JSON.withCharset("UTF-8")));
         try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
