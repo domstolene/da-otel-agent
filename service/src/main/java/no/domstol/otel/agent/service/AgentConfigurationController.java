@@ -57,7 +57,7 @@ public class AgentConfigurationController {
         if (!getConfigurations().containsKey(agentName)) {
             return ResponseEntity.notFound().build();
         }
-        if (getConfigurations().get(configuration.getServiceName()).isReadOnly()) {
+        if (getConfigurations().get(agentName).isReadOnly()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
         }
         getConfigurations().put(configuration.getServiceName(), configuration);
@@ -65,15 +65,27 @@ public class AgentConfigurationController {
     }
 
     @PutMapping("/agent-configuration")
-    public void editAgentConfiguration(@RequestBody AgentConfiguration configuration) {
-        // TODO: Fix 404 or 403
+    public ResponseEntity<String> editAgentConfiguration(@RequestBody AgentConfiguration configuration) {
+        if (!getConfigurations().containsKey(configuration.getServiceName())) {
+            return ResponseEntity.notFound().build();
+        }
+        if (getConfigurations().get(configuration.getServiceName()).isReadOnly()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
+        }
         getConfigurations().put(configuration.getServiceName(), configuration);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/agent-configuration/{agentName}")
-    public void deleteAgentConfiguration(@PathVariable String agentName) {
-        // TODO: Return 403 if readOnly and 404 if not found
+    public ResponseEntity<String> deleteAgentConfiguration(@PathVariable String agentName) {
+        if (!getConfigurations().containsKey(agentName)) {
+            return ResponseEntity.notFound().build();
+        }
+        if (getConfigurations().get(agentName).isReadOnly()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
+        }
         getConfigurations().remove(agentName);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/agent-configuration")
