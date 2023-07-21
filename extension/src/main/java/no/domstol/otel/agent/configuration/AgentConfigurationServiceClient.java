@@ -28,8 +28,7 @@ import io.opentelemetry.sdk.trace.samplers.Sampler;
 import no.domstol.otel.trace.samplers.SamplerMetrics;
 
 /**
- * This type will connect to the OpenTelemetry Configuration Service and if
- * possible return an {@link AgentConfiguration} for use in the {@link Sampler}.
+ * This type deals with the OpenTelemetry Configuration Service.
  *
  * @since 1.0
  */
@@ -44,6 +43,10 @@ public class AgentConfigurationServiceClient {
      * Calls the configuration service to obtain a sampler configuration for this
      * agent. If the agent is not registered or obtaining a configuration fails, the
      * initial configuration will be returned.
+     * <p>
+     * If the configuration service contains the agent configuration, collected
+     * {@link Sampler} metrics for this will be posted.
+     * </p>
      *
      * @param initialConfig Initial agent configuration
      * @param otelConfig    OpenTelemetry configuration
@@ -105,7 +108,7 @@ public class AgentConfigurationServiceClient {
             }
     }
 
-    public void postMetrics(String serviceName, String configurationServiceUrl, String apiKey, SamplerMetrics metrics)
+    private void postMetrics(String serviceName, String configurationServiceUrl, String apiKey, SamplerMetrics metrics)
             throws UnsupportedCharsetException, ClientProtocolException, IOException {
         HttpPost postRequest = new HttpPost(configurationServiceUrl + "/metrics/" + serviceName);
         if (apiKey != null)
