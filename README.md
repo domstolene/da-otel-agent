@@ -54,13 +54,17 @@ While the dynamic sampler is working, the following metrics are collected and ex
 
 Note that the current implementation of the service does _not_ persist agent configurations or metrics. If the service is restarted everything will be lost, however data should be available again once the agents report their configurations and metrics. This may take up to 30 seconds.
 
+### Security
+
+The configuration service can be secured using a API key. This is enabled by specifying `-Dotel.configuration.service.api.key="<key>"` as a JVM parameter when starting the service. The same property must be used when configuring the agent.
+
 ## Usage
 
 There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both. 
 
 A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this version, unless the `readOnly` flag is set to true. The configuration file will automatically be reloaded if changed.
 
-### Example configuration
+### Example agent configuration
 
 ```shell
   -javaagent:da-opentelemetry-javaagent.jar \
@@ -89,7 +93,7 @@ Notice that `otel.traces.sampler` must be set to `dynamic`, while the `sampler` 
 
 In order to test this setup, first start Jaeger and Prometheus by calling `docker compose up` found in the root folder. This will start a new Jaeger instance in Docker and expose port 4317 for tracing and <a href="http://localhost:16686">http://localhost:16686</a> for the UI. The Prometheus UI will be available at <a href="http://localhost:9090">http://localhost:9090</a>
 
-Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service instrumented using the built agent.
+Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service instrumented using the built agent. Note that the service has been configured to add a bit of security using an API key.
 
 Since the configuration service is not started when it's being instrumented, obtaining the remote configuration will fail and defaults will be used. You will see something like this in the log:
 
@@ -108,7 +112,7 @@ Self-registered as "da-otel-agent-service" at the OTEL Configuration Service
 Now getting the available configurations from the service will a JSON array with all the agent configurations:
 
 ```
-curl -s -X GET http://localhost:8080/agent-configuration | jq
+curl -s -H "X-API-KEY: 0DAE3387-4CDA-417D-B084-53BEC56B7B55"  -X GET http://localhost:8080/agent-configuration | jq
 [
   {
     "serviceName": "da-otel-agent-service",
@@ -121,7 +125,7 @@ curl -s -X GET http://localhost:8080/agent-configuration | jq
 In order to test the agent and the service you can execute the following to turn on sampling:
 
 ```bash
-curl -X POST http://localhost:8080/agent-configuration \
+curl -H "X-API-KEY: 0DAE3387-4CDA-417D-B084-53BEC56B7B55" -X POST http://localhost:8080/agent-configuration \
   -H 'Content-Type: application/json' \
   -d '{"serviceName":"da-otel-agent-service", "sampler":"always_on"}'
 ```

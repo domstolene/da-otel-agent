@@ -35,6 +35,7 @@ import no.domstol.otel.trace.samplers.SamplerMetrics;
  */
 public class AgentConfigurationServiceClient {
 
+    private static final String API_KEY_HEADER = "X-API-KEY";
     private static final Logger logger = Logger.getLogger(AgentConfigurationServiceClient.class.getName());
     private static final CloseableHttpClient httpClient = HttpClients.createDefault();
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -53,10 +54,12 @@ public class AgentConfigurationServiceClient {
     public AgentConfiguration synchronize(AgentConfiguration initialConfig, ConfigProperties otelConfig,
             SamplerMetrics metrics) {
         String configurationServiceUrl = otelConfig.getString("otel.configuration.service.url");
+        String apiKey = otelConfig.getString("otel.configuration.service.api.key");
         try {
             HttpGet request = new HttpGet(
                     configurationServiceUrl + "/agent-configuration/" + initialConfig.getServiceName());
             request.addHeader("Accept", "application/json");
+            request.addHeader(API_KEY_HEADER, apiKey);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = response.getEntity();
@@ -64,13 +67,14 @@ public class AgentConfigurationServiceClient {
                         String result = EntityUtils.toString(entity);
                         AgentConfiguration agentConfiguration = objectMapper.readValue(result,
                                 AgentConfiguration.class);
-                        postMetrics(initialConfig.getServiceName(), configurationServiceUrl, metrics);
+                        postMetrics(initialConfig.getServiceName(), configurationServiceUrl, apiKey, metrics);
                         return agentConfiguration;
                     }
                 } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-                    selfRegister(initialConfig, configurationServiceUrl);
+                    selfRegister(initialConfig, configurationServiceUrl, apiKey);
                 } else {
-                    logger.severe("Error: " + response.getStatusLine().getStatusCode());
+                    logger.severe("Configuration service connection failed with status code: "
+                            + response.getStatusLine().getStatusCode());
                 }
             }
         } catch (Exception e) {
@@ -80,9 +84,10 @@ public class AgentConfigurationServiceClient {
         return initialConfig;
     }
 
-    private void selfRegister(AgentConfiguration initialConfig, String configurationServiceUrl)
+    private void selfRegister(AgentConfiguration initialConfig, String configurationServiceUrl, String apiKey)
             throws UnsupportedCharsetException, JsonProcessingException {
             HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
+            postRequest.addHeader(API_KEY_HEADER, apiKey);
             postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(initialConfig),
                     ContentType.APPLICATION_JSON.withCharset("UTF-8")));
             try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
@@ -98,9 +103,10 @@ public class AgentConfigurationServiceClient {
             }
     }
 
-    public void postMetrics(String serviceName, String configurationServiceUrl, SamplerMetrics metrics)
+    public void postMetrics(String serviceName, String configurationServiceUrl, String apiKey, SamplerMetrics metrics)
             throws UnsupportedCharsetException, ClientProtocolException, IOException {
         HttpPost postRequest = new HttpPost(configurationServiceUrl + "/metrics/" + serviceName);
+        postRequest.addHeader(API_KEY_HEADER, apiKey);
         postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(metrics.copyAndClear()),
                 ContentType.APPLICATION_JSON.withCharset("UTF-8")));
         try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
