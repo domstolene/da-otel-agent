@@ -2,13 +2,8 @@ name: Build and publish release
 
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
-      release_version:
-        type: string
-        description: Release version.
-        required: false
-        default: "1.0.0"
 
 jobs:
   build:
