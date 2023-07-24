@@ -13,7 +13,7 @@ ext {
     opentelemetryJavaagent     : "1.27.0-SNAPSHOT",
     opentelemetryJavaagentAlpha: "1.27.0-alpha-SNAPSHOT ",
   ]
-
+  jarToPublish = file( 'build/libs/da-opentelemetry-javaagent.jar' )
   deps = [
     autoservice: dependencies.create(group: 'com.google.auto.service', name: 'auto-service', version: '1.1.1')
   ]
@@ -43,8 +43,7 @@ publishing {
           groupId = "no.domstolene"
           artifactId = "da-opentelemetry-javaagent"
           version = "1.1.0"
-
-          from components.java
+          artifact jarToPublish
       }
   }
 }
