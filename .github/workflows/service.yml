@@ -1,0 +1,87 @@
+name: Create and publish a Docker image
+
+on:
+  workflow_dispatch:
+
+# Defines two custom environment variables for the workflow. These are used for 
+# the Container registry domain, and a name for the Docker image that this
+# workflow builds.
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
+
+jobs:
+  build:
+    name: Build and test artefacts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Gradle validate wrapper
+      uses: gradle/wrapper-validation-action@v1
+
+    - name: Gradle build agent and service
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: wrapper
+        arguments: build --no-daemon
+
+#    - name: Gradle publish agent
+#      uses: gradle/gradle-build-action@v2
+#      env: 
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        GITHUB_ACTOR: ${{ github.actor }}
+#      with:
+#        gradle-version: wrapper
+#        arguments: publish --no-daemon
+
+    # Upload extension JAR for use in next job.
+    - uses: actions/upload-artifact@v3
+      with:
+        name: da-opentelemetry-javaagent.jar
+        path: extension/build/libs/da-opentelemetry-javaagent.jar
+        if-no-files-found: error
+
+    # Upload service JAR for use in next job.
+    - uses: actions/upload-artifact@v3
+      with:
+        name: service.jar
+        path: service/build/libs/service.jar
+        if-no-files-found: error
+
+  build-and-push-image:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
