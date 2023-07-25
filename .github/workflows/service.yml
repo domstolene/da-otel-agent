@@ -11,8 +11,8 @@ env:
   IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
 
 jobs:
-  build:
-    name: Build and test artefacts
+  build-and-test-artifacts:
+    name: Build and test artifacts
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -61,6 +61,7 @@ jobs:
 
   build-and-push-image:
     name: Build and push image
+    needs: build-and-test-artifacts
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -84,15 +85,6 @@ jobs:
 
       - name: Download artefacts from previous job
         uses: actions/download-artifact@v3
-        with:
-          name: da-opentelemetry-javaagent.jar
-          path: da-opentelemetry-javaagent.jar
-
-      - name: Download artefacts from previous job
-        uses: actions/download-artifact@v3
-        with:
-          name: service.jar
-          path: service.jar
 
       - name: Display structure of downloaded files
         run: ls -R
