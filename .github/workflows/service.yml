@@ -75,15 +75,21 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
-
-      - name: Download artefacts from previous step
-        uses: actions/download-artifact@v3
-
+        
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Download artefacts from previous job
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: artifacts
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
