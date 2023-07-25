@@ -58,7 +58,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
     private static ConfigurationFileReader localConfigReader;
     private static DynamicSamplerWrapper wrapper;
     private static ConfigProperties initialConfig;
-    private static AgentConfiguration configuration = new AgentConfiguration();
+    private static AgentConfiguration configuration;
     private static ScheduledExecutorService executor;
 
     private class ConfigurationFileReader extends Thread {
@@ -124,11 +124,18 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
         String configurationServiceFile = config.getString("otel.configuration.service.file");
         String configurationServiceUrl = config.getString("otel.configuration.service.url");
+        String serviceName = initialConfig.getString("otel.service.name");
 
         if (configurationServiceFile == null && configurationServiceUrl == null) {
             throw new IllegalArgumentException(
                     "At least one of 'otel.configuration.service.file' and 'otel.configuration.service.url' must be specified");
         }
+
+        // create the initial configuration
+        configuration = new AgentConfiguration();
+        // set the service name, in case we don't have a configuration file and
+        // the agent configuration is not found at the configuration service
+        configuration.setServiceName(serviceName);
 
         // read the configuration from a file if specified
         if (configurationServiceFile != null) {
