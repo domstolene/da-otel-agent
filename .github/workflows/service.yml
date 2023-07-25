@@ -85,6 +85,8 @@ jobs:
 
       - name: Download artefacts from previous job
         uses: actions/download-artifact@v3
+        with:
+          path: ./
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
