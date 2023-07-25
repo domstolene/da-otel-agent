@@ -93,6 +93,8 @@ jobs:
         with:
           name: service.jar
 
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
