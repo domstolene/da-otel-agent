@@ -17,11 +17,11 @@ WORKDIR /app/
 
 # Using Shell-form for normal shell processing
 ENTRYPOINT java -jar $JAVA_OPTS \
-  -javaagent:$current_dir/da-opentelemetry-javaagent.jar \
+  -javaagent:/app/da-opentelemetry-javaagent.jar \
   -Dotel.metrics.exporter="none" \
   -Dotel.traces.sampler="dynamic" \
   -Dotel.service.name="da-otel-agent-service" \
   -Dotel.configuration.service.url="http://localhost:8080" \
-  -Dotel.configuration.service.fil=$current_dir/sampler-configuration.yaml \
+  -Dotel.configuration.service.fil=/app/sampler-configuration.yaml \
   -Dotel.javaagent.logging=application \
-  $current_dir/service.jar
+  /app/service.jar
