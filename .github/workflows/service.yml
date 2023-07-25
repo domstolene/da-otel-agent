@@ -48,12 +48,14 @@ jobs:
     # Upload extension JAR for use in next job.
     - uses: actions/upload-artifact@v3
       with:
+        name: da-opentelemetry-javaagent.jar
         path: extension/build/libs/da-opentelemetry-javaagent.jar
         if-no-files-found: error
 
     # Upload service JAR for use in next job.
     - uses: actions/upload-artifact@v3
       with:
+        name: service.jar
         path: service/build/libs/service.jar
         if-no-files-found: error
 
@@ -81,8 +83,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Download artefacts from previous job
+      - name: Download da-opentelemetry-javaagent.jar from previous job
         uses: actions/download-artifact@v3
+        with:
+          name: da-opentelemetry-javaagent.jar
+
+      - name: Download service.jar from previous job
+        uses: actions/download-artifact@v3
+        with:
+          name: service.jar
+
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
