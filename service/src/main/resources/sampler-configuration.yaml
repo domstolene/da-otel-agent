@@ -1,0 +1,10 @@
+serviceName: da-otel-agent-service
+sampler: parentbased_always_on
+sampleRatio: 1
+readOnly: false
+rules:
+  - exclude:
+    - http.target: "/agent-configuration/.+"
+      http.method: "GET"
+  - include:
+    - http.method: "POST"
