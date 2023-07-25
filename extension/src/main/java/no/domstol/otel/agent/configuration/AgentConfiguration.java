@@ -33,8 +33,11 @@ public class AgentConfiguration {
         always_on, always_off, traceidratio, parentbased_always_on, parentbased_always_off, parentbased_traceidratio,
     }
 
+    // use the same default value as OpenTelemetry, in case the same somehow
+    // does not get specified
+    // https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md#opentelemetry-resource
     @JsonProperty("serviceName")
-    private String serviceName;
+    private String serviceName = "unknown_service:java";
 
     @JsonProperty("sampler")
     private SamplerType sampler = SamplerType.parentbased_always_off;

@@ -126,6 +126,12 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
         String configurationServiceUrl = config.getString("otel.configuration.service.url");
         String serviceName = initialConfig.getString("otel.service.name");
 
+        // there is no reason to not specify a name for the service, unless one
+        // is not sampling anything
+        if (serviceName == null) {
+            throw new IllegalArgumentException("The OTEL service name must be specified with 'otel.service.name'");
+        }
+
         if (configurationServiceFile == null && configurationServiceUrl == null) {
             throw new IllegalArgumentException(
                     "At least one of 'otel.configuration.service.file' and 'otel.configuration.service.url' must be specified");
@@ -146,6 +152,8 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             localConfigReader = new ConfigurationFileReader(configurationServiceFile);
             configuration = localConfigReader.readConfigurationFile();
             wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
+        } else {
+            logger.info("Sampler configuration file not specified, using defaults");
         }
 
         // read the configuration from the service if specified
