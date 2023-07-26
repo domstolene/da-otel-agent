@@ -1,5 +1,5 @@
 
-# DA OpenTelemetry Agent
+# DA OpenTelemetry Agent & Service
 
 This project delivers an [OpenTelemetry Java Agent](https://opentelemetry.io/docs/instrumentation/java/automatic/) including a remotely configurable [sampler](https://opentelemetry.io/docs/concepts/sampling/), along with the accompanying REST service for configuring it. 
 
@@ -38,12 +38,12 @@ More than one tag can be specified in each rule, and all must match for the rule
 
 The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API supports all the common REST verbs except `PATCH`. The endpoints are as follows:
 
-* `POST` `/agent-configuration` – Posts a _new_ agent configuration. The configuration must be in the payload.
-* `GET` `/agent-configuration/<id>` – Returns an agent configuration or 404 if not found.
-* `PUT` `/agent-configuration/<id>` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
-* `PUT` `/agent-configuration` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
-* `DELETE` `/agent-configuration/<id>` – Deletes the agent configuration.
-* `GET` `/agent-configuration` – Returns all agent configurations.
+* `POST /agent-configuration` – Posts a _new_ agent configuration. The configuration must be in the payload.
+* `GET /agent-configuration/<id>` – Returns an agent configuration or 404 if not found.
+* `PUT /agent-configuration/<id>` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
+* `PUT /agent-configuration` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
+* `DELETE /agent-configuration/<id>` – Deletes the agent configuration.
+* `GET /agent-configuration` – Returns all agent configurations.
 
 While the dynamic sampler is working, the following metrics are collected and exposed on the [Prometheus](https://prometheus.io) compatible endpoint `/metrics`. For each of the configured services, the following metrics are collected:
 
@@ -55,9 +55,13 @@ While the dynamic sampler is working, the following metrics are collected and ex
 
 Note that the current implementation of the service does _not_ persist agent configurations or metrics. If the service is restarted everything will be lost, however data should be available again once the agents report their configurations and metrics. This may take up to 30 seconds.
 
+### Configuration
+
+The service is delivered as a Docker image, ready to be deployed. The service is itself configured to be instrumented with the agent. However no exporters are defined, so traces are not submitted to any collectors. The default values can be overridden by specifying these in the environment variable `$JAVA_OPTS`.
+
 ### Security
 
-The configuration service can be secured using a API key. This is enabled by specifying `-Dotel.configuration.service.api.key="<key>"` as a JVM parameter when starting the service. The same property must be used when configuring the agent.
+The configuration service can be secured using a API key. This is enabled by specifying `-Dotel.configuration.service.api.key="<key>"` as a JVM option when starting the service. The same property must be used when configuring the agent.
 
 ## Usage
 
@@ -69,10 +73,12 @@ A typical use case would be to set up a file based configuration while pointing 
 
 ```shell
   -javaagent:da-opentelemetry-javaagent.jar \
+  -Dotel.metrics.exporter="none" \
   -Dotel.service.name="my-service" \
   -Dotel.traces.sampler="dynamic" \
   -Dotel.configuration.service.file="otel-configuration-file.yaml" \
   -Dotel.configuration.service.url="http://otel-configuration-service.test" \
+  -Dotel.exporter.otlp.endpoint="http://otel-collector.test:4318"
 ```
 
 ```yaml
