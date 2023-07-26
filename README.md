@@ -30,7 +30,7 @@ rules:
     - http.method: "POST"
 ```
 
-In this example all HTTP `GET` calls to the health endpoint are ignored, while all `POST` calls are sampled. If the tags does not match any of these configurations, it is up to the underlying sampler to determine whether or not the span should be created.
+In this example all HTTP `GET` calls to the health and metrics endpoints are ignored, while all `POST` calls are sampled. If the tags does not match any of these rules, it is up to the underlying sampler to determine whether or not the span should be created.
 
 More than one tag can be specified in each rule, and all must match for the rule to trigger. Also notice that Java regular expressions can be used.
 
