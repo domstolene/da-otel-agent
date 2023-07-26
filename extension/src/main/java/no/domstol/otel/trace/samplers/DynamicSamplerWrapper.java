@@ -42,7 +42,7 @@ public class DynamicSamplerWrapper implements Sampler {
     public SamplingResult shouldSample(Context parentContext, String traceId, String name, SpanKind spanKind,
             Attributes attributes, List<LinkData> parentLinks) {
         try {
-            metrics.total_samples.incrementAndGet();
+            metrics.processed_samples.incrementAndGet();
             // Include samples based on the rules provided
             List<Map<AttributeKey<String>, Pattern>> includes = rules.get("include");
             if (includes != null) {
@@ -58,7 +58,8 @@ public class DynamicSamplerWrapper implements Sampler {
                         }
                     }
                     if (include) {
-                        metrics.included_samples.incrementAndGet();
+                        metrics.filter_included_samples.incrementAndGet();
+                        metrics.recorded_samples.incrementAndGet();
                         logger.fine("including sample because " + group);
                         return SamplingResult.create(SamplingDecision.RECORD_AND_SAMPLE);
                     }
@@ -79,7 +80,8 @@ public class DynamicSamplerWrapper implements Sampler {
                             }
                     }
                     if (exclude) {
-                        metrics.excluded_samples.incrementAndGet();
+                        metrics.filter_excluded_samples.incrementAndGet();
+                        metrics.dropped_samples.incrementAndGet();
                         logger.fine("Dropping sample because " + group);
                         return SamplingResult.create(SamplingDecision.DROP);
                     }
@@ -92,8 +94,10 @@ public class DynamicSamplerWrapper implements Sampler {
         SamplingResult shouldSample = getCurrentSampler().shouldSample(parentContext, traceId, name, spanKind,
                 attributes, parentLinks);
         if (shouldSample.getDecision().equals(SamplingDecision.DROP)) {
+            getMetrics().sampler_excluded_samples.incrementAndGet();
             getMetrics().dropped_samples.incrementAndGet();
         } else if (shouldSample.getDecision().equals(SamplingDecision.RECORD_AND_SAMPLE)) {
+            getMetrics().sampler_included_samples.incrementAndGet();
             getMetrics().recorded_samples.incrementAndGet();
         }
         return shouldSample;

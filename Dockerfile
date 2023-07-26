@@ -26,7 +26,6 @@ ENTRYPOINT java -jar \
   -Dotel.service.name="da-otel-agent-service" \
   -Dotel.configuration.service.url="http://localhost:8080" \
   -Dotel.configuration.service.file=/app/sampler-configuration.yaml \
-  -Dotel.exporter.otlp.endpoint="http://otel-collector.test:4318" \
   -Dotel.javaagent.logging=application \
   $JAVA_OPTS \
   /app/service.jar

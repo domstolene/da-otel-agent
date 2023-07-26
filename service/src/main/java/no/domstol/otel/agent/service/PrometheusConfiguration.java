@@ -1,3 +1,7 @@
+/*
+ * Copyright Domstoladministrasjonen, Norway
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package no.domstol.otel.agent.service;
 
 import org.springframework.context.annotation.Bean;
