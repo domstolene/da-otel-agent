@@ -12,36 +12,48 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class SamplerMetrics {
 
-    /** The total number of samples processed */
-    @JsonProperty("total_samples")
-    AtomicLong total_samples = new AtomicLong();
-
     /** The number of samples dropped due to filtering rules */
-    @JsonProperty("excluded_samples")
-    AtomicLong excluded_samples = new AtomicLong();
+    @JsonProperty("filter_excluded_samples")
+    AtomicLong filter_excluded_samples = new AtomicLong();
 
     /** The number of samples recorded due to filtering rules */
-    @JsonProperty("included_samples")
-    AtomicLong included_samples = new AtomicLong();
+    @JsonProperty("filter_included_samples")
+    AtomicLong filter_included_samples = new AtomicLong();
 
-    /** The number of samples dropped by the underlying sampler */
+    /** The number of samples dropped due to sampler rules */
+    @JsonProperty("sampler_excluded_samples")
+    AtomicLong sampler_excluded_samples = new AtomicLong();
+
+    /** The number of samples recorded due to sampler rules */
+    @JsonProperty("sampler_included_samples")
+    AtomicLong sampler_included_samples = new AtomicLong();
+
+    /** The number of samples processed */
+    @JsonProperty("processed_samples")
+    AtomicLong processed_samples = new AtomicLong();
+
+    /** The number of samples dropped */
     @JsonProperty("dropped_samples")
     AtomicLong dropped_samples = new AtomicLong();
 
-    /** The number of samples recorded by the underlying sampler */
+    /** The number of samples recorded */
     @JsonProperty("recorded_samples")
     AtomicLong recorded_samples = new AtomicLong();
 
     public synchronized SamplerMetrics copyAndClear() {
         SamplerMetrics copy = new SamplerMetrics();
-        copy.total_samples.set(total_samples.get());
-        copy.excluded_samples.set(excluded_samples.get());
-        copy.included_samples.set(included_samples.get());
+        copy.filter_excluded_samples.set(filter_excluded_samples.get());
+        copy.filter_included_samples.set(filter_included_samples.get());
+        copy.sampler_excluded_samples.set(sampler_excluded_samples.get());
+        copy.sampler_included_samples.set(sampler_included_samples.get());
+        copy.processed_samples.set(processed_samples.get());
         copy.dropped_samples.set(dropped_samples.get());
         copy.recorded_samples.set(recorded_samples.get());
-        total_samples.set(0);
-        excluded_samples.set(0);
-        included_samples.set(0);
+        filter_excluded_samples.set(0);
+        filter_included_samples.set(0);
+        sampler_excluded_samples.set(0);
+        sampler_included_samples.set(0);
+        processed_samples.set(0);
         dropped_samples.set(0);
         recorded_samples.set(0);
         return copy;

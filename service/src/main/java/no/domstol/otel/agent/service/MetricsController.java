@@ -1,3 +1,7 @@
+/*
+ * Copyright Domstoladministrasjonen, Norway
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package no.domstol.otel.agent.service;
 
 import org.springframework.http.MediaType;
@@ -16,6 +20,13 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
 @RequestMapping("/metrics")
 public class MetricsController {
 
+    private static final String OTEL_AGENTS_PROCESSED_SAMPLES = "otel_agents_processed_samples";
+    private static final String OTEL_AGENTS_SAMPLER_INCLUDED_SAMPLES = "otel_agents_sampler_included_samples";
+    private static final String OTEL_AGENTS_SAMPLER_EXCLUDED_SAMPLES = "otel_agents_sampler_excluded_samples";
+    private static final String OTEL_AGENTS_FILTER_INCLUDED_SAMPLES = "otel_agents_filter_included_samples";
+    private static final String OTEL_AGENTS_FILTER_EXCLUDED_SAMPLES = "otel_agents_filter_excluded_samples";
+    private static final String OTEL_AGENTS_DROPPED_SAMPLES = "otel_agents_dropped_samples";
+    private static final String OTEL_AGENTS_RECORDED_SAMPLES = "otel_agents_recorded_samples";
     private static final String TAG_NAME = "otel.service.name";
     private final PrometheusMeterRegistry registry;
     private boolean registered;
@@ -25,20 +36,26 @@ public class MetricsController {
     }
 
     private void registerCounters(String serviceName) {
-        Counter.builder("otel_agents_recorded_samples").tag(TAG_NAME, serviceName)
-                .description("the number of samples recorded by the underlying sampler").baseUnit("samples")
+        Counter.builder(OTEL_AGENTS_RECORDED_SAMPLES).tag(TAG_NAME, serviceName)
+                .description("the number of samples recorded").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_dropped_samples").tag(TAG_NAME, serviceName)
-                .description("the number of samples dropped by the underlying sampler").baseUnit("samples")
+        Counter.builder(OTEL_AGENTS_DROPPED_SAMPLES).tag(TAG_NAME, serviceName)
+                .description("the number of samples dropped").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_excluded_samples").tag(TAG_NAME, serviceName)
-                .description("the number of samples recorded due to filtering rules ").baseUnit("samples")
+        Counter.builder(OTEL_AGENTS_FILTER_EXCLUDED_SAMPLES).tag(TAG_NAME, serviceName)
+                .description("the number of samples excluded due to filtering rules").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_included_samples").tag(TAG_NAME, serviceName)
-                .description("the number of samples dropped due to filtering rules").baseUnit("samples")
+        Counter.builder(OTEL_AGENTS_FILTER_INCLUDED_SAMPLES).tag(TAG_NAME, serviceName)
+                .description("the number of samples included due to filtering rules").baseUnit("samples")
                 .register(registry);
-        Counter.builder("otel_agents_total_samples").tag(TAG_NAME, serviceName)
-                .description("the total number of samples processed")
+        Counter.builder(OTEL_AGENTS_SAMPLER_EXCLUDED_SAMPLES).tag(TAG_NAME, serviceName)
+                .description("the number of samples excluded due to sampling rules").baseUnit("samples")
+                .register(registry);
+        Counter.builder(OTEL_AGENTS_SAMPLER_INCLUDED_SAMPLES).tag(TAG_NAME, serviceName)
+                .description("the number of samples included due to sampling rules").baseUnit("samples")
+                .register(registry);
+        Counter.builder(OTEL_AGENTS_PROCESSED_SAMPLES).tag(TAG_NAME, serviceName)
+                .description("the number of samples processed")
                 .baseUnit("samples").register(registry);
     }
 
@@ -54,16 +71,20 @@ public class MetricsController {
             registerCounters(serviceName);
             registered = true;
         }
-        registry.counter("otel_agents_recorded_samples", TAG_NAME, serviceName)
+        registry.counter(OTEL_AGENTS_RECORDED_SAMPLES, TAG_NAME, serviceName)
                 .increment(metrics.recorded_samples.doubleValue());
-        registry.counter("otel_agents_dropped_samples", TAG_NAME, serviceName)
+        registry.counter(OTEL_AGENTS_DROPPED_SAMPLES, TAG_NAME, serviceName)
                 .increment(metrics.dropped_samples.doubleValue());
-        registry.counter("otel_agents_excluded_samples", TAG_NAME, serviceName)
-                .increment(metrics.excluded_samples.doubleValue());
-        registry.counter("otel_agents_included_samples", TAG_NAME, serviceName)
-                .increment(metrics.included_samples.doubleValue());
-        registry.counter("otel_agents_total_samples", TAG_NAME, serviceName)
-                .increment(metrics.total_samples.doubleValue());
+        registry.counter(OTEL_AGENTS_FILTER_EXCLUDED_SAMPLES, TAG_NAME, serviceName)
+                .increment(metrics.filter_excluded_samples.doubleValue());
+        registry.counter(OTEL_AGENTS_FILTER_INCLUDED_SAMPLES, TAG_NAME, serviceName)
+                .increment(metrics.filter_included_samples.doubleValue());
+        registry.counter(OTEL_AGENTS_SAMPLER_EXCLUDED_SAMPLES, TAG_NAME, serviceName)
+                .increment(metrics.sampler_excluded_samples.doubleValue());
+        registry.counter(OTEL_AGENTS_SAMPLER_INCLUDED_SAMPLES, TAG_NAME, serviceName)
+                .increment(metrics.sampler_included_samples.doubleValue());
+        registry.counter(OTEL_AGENTS_PROCESSED_SAMPLES, TAG_NAME, serviceName)
+                .increment(metrics.processed_samples.doubleValue());
         return ResponseEntity.ok("Success");
     }
 

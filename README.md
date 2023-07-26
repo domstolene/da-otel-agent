@@ -48,10 +48,12 @@ The _OpenTelemetry Configuration Service_ is a component of this project that ke
 While the dynamic sampler is working, the following metrics are collected and exposed on the [Prometheus](https://prometheus.io) compatible endpoint `/metrics`. For each of the configured services, the following metrics are collected:
 
 * the total number of samples processed
-* the number of samples recorded by the underlying sampler
-* the number of samples dropped due to filtering rules
-* the number of samples dropped by the underlying sampler
-* the number of samples recorded due to filtering rules
+* the toal number of samples recorded
+* the total number of samples dropped
+* the number of samples excluded by filtering rules
+* the number of samples included by filtering rules
+* the number of samples excluded by sampling rules
+* the number of samples included by sampling rules
 
 Note that the current implementation of the service does _not_ persist agent configurations or metrics. If the service is restarted everything will be lost, however data should be available again once the agents report their configurations and metrics. This may take up to 30 seconds.
 
