@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  build-and-test:
+    name: Build and test
     runs-on: ubuntu-latest
 
     steps:

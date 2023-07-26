@@ -73,12 +73,13 @@ A typical use case would be to set up a file based configuration while pointing 
 
 ```shell
   -javaagent:da-opentelemetry-javaagent.jar \
-  -Dotel.metrics.exporter="none" \
-  -Dotel.service.name="my-service" \
-  -Dotel.traces.sampler="dynamic" \
-  -Dotel.configuration.service.file="otel-configuration-file.yaml" \
-  -Dotel.configuration.service.url="http://otel-configuration-service.test" \
-  -Dotel.exporter.otlp.endpoint="http://otel-collector.test:4318"
+  -Dotel.metrics.exporter=none \
+  -Dotel.service.name=my-service \
+  -Dotel.traces.sampler=dynamic \
+  -Dotel.configuration.service.file=otel-configuration-file.yaml \
+  -Dotel.configuration.service.url=http://otel-configuration-service.test \
+  -Dotel.exporter.otlp.endpoint=http://otel-collector.test:4317 \
+  -Dotel.traces.exporter=otlp
 ```
 
 ```yaml
