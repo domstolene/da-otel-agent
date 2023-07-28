@@ -42,7 +42,7 @@ publishing {
       maven(MavenPublication) {
           groupId = "no.domstolene"
           artifactId = "da-opentelemetry-javaagent"
-          version = "1.2.0"
+          version = "1.2.1"
           artifact jarToPublish
       }
   }
