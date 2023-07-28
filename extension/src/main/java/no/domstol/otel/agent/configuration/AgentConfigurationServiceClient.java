@@ -14,6 +14,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -48,19 +49,19 @@ public class AgentConfigurationServiceClient {
      * {@link Sampler} metrics for this will be posted.
      * </p>
      *
-     * @param initialConfig Initial agent configuration
+     * @param localConfig Initial agent configuration
      * @param otelConfig    OpenTelemetry configuration
      * @param metrics       Sampler metrics
      *
      * @return the agent configuration
      */
-    public AgentConfiguration synchronize(AgentConfiguration initialConfig, ConfigProperties otelConfig,
+    public AgentConfiguration synchronize(AgentConfiguration localConfig, ConfigProperties otelConfig,
             SamplerMetrics metrics) {
         String configurationServiceUrl = otelConfig.getString("otel.configuration.service.url");
         String apiKey = otelConfig.getString("otel.configuration.service.api.key");
         try {
             HttpGet request = new HttpGet(
-                    configurationServiceUrl + "/agent-configuration/" + initialConfig.getServiceName());
+                    configurationServiceUrl + "/agent-configuration/" + localConfig.getServiceName());
             request.addHeader("Accept", "application/json");
             if (apiKey != null)
                 request.addHeader(API_KEY_HEADER, apiKey);
@@ -69,13 +70,27 @@ public class AgentConfigurationServiceClient {
                     HttpEntity entity = response.getEntity();
                     if (entity != null) {
                         String result = EntityUtils.toString(entity);
-                        AgentConfiguration agentConfiguration = objectMapper.readValue(result,
+                        // read the remote agent configuration
+                        AgentConfiguration remoteConfig = objectMapper.readValue(result,
                                 AgentConfiguration.class);
-                        postMetrics(initialConfig.getServiceName(), configurationServiceUrl, apiKey, metrics);
-                        return agentConfiguration;
+                        // while we're at it, post the metrics
+                        postMetrics(localConfig.getServiceName(), configurationServiceUrl, apiKey, metrics);
+                        // if the local configuration does not have a timestamp,
+                        // it's the initial/default one and we should use the remote version
+                        if (localConfig.getTimestamp() == 0) {
+                            return remoteConfig;
+                        }
+                        // if the local configuration is newer, it has been read
+                        // from a file that is more current, so we should update
+                        // the remote configuration
+                        if (localConfig.getTimestamp() > remoteConfig.getTimestamp()) {
+                            update(localConfig, configurationServiceUrl, apiKey);
+                            return localConfig;
+                        }
+                        return remoteConfig;
                     }
                 } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-                    selfRegister(initialConfig, configurationServiceUrl, apiKey);
+                    selfRegister(localConfig, configurationServiceUrl, apiKey);
                 } else {
                     logger.severe("Configuration service connection failed with status code: "
                             + response.getStatusLine().getStatusCode());
@@ -83,22 +98,43 @@ public class AgentConfigurationServiceClient {
             }
         } catch (Exception e) {
             logger.severe("Could not connect to OTEL Configuration Service at " + configurationServiceUrl
-                    + ", using sampler \"" + initialConfig.getSampler() + "\".");
+                    + ", using sampler \"" + localConfig.getSampler() + "\".");
         }
-        return initialConfig;
+        return localConfig;
     }
 
-    private void selfRegister(AgentConfiguration initialConfig, String configurationServiceUrl, String apiKey)
+    private void update(AgentConfiguration configuration, String configurationServiceUrl, String apiKey)
+            throws UnsupportedCharsetException, JsonProcessingException {
+        HttpPut request = new HttpPut(configurationServiceUrl + "/agent-configuration");
+        if (apiKey != null)
+            request.addHeader(API_KEY_HEADER, apiKey);
+        request.setEntity(new StringEntity(objectMapper.writeValueAsString(configuration),
+                ContentType.APPLICATION_JSON.withCharset("UTF-8")));
+        try (CloseableHttpResponse execute = httpClient.execute(request)) {
+            int statusCode = execute.getStatusLine().getStatusCode();
+            if (statusCode >= 200 && statusCode < 300) {
+                logger.info("Uploading current configuration to the OTEL Configuration Service");
+            } else {
+                logger.severe(
+                        "Uploading current configuration to the OTEL Configuration Service failed with status code: "
+                                + statusCode);
+            }
+        } catch (Exception e) {
+            logger.severe("Failed to upload current configuration to the OTEL Configuration Service");
+        }
+    }
+
+    private void selfRegister(AgentConfiguration configuration, String configurationServiceUrl, String apiKey)
             throws UnsupportedCharsetException, JsonProcessingException {
             HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
             if (apiKey != null)
                 postRequest.addHeader(API_KEY_HEADER, apiKey);
-            postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(initialConfig),
+            postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(configuration),
                     ContentType.APPLICATION_JSON.withCharset("UTF-8")));
             try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
                 int statusCode = execute.getStatusLine().getStatusCode();
                 if (statusCode >= 200 && statusCode < 300) {
-                    logger.info("Self-registered as \"" + initialConfig.getServiceName()
+                    logger.info("Self-registered as \"" + configuration.getServiceName()
                             + "\" at the OTEL Configuration Service");
                 } else {
                     logger.severe("Self registering failed with status code: " + statusCode);

@@ -48,6 +48,9 @@ public class AgentConfiguration {
     @JsonProperty("readOnly")
     private boolean readOnly = true;
 
+    @JsonProperty("timestamp")
+    private long timestamp = 0;
+
     @JsonProperty("rules")
     private List<Rules> rules;
 
@@ -148,6 +151,14 @@ public class AgentConfiguration {
         ruleSets.put("include", includeSet);
 
         return ruleSets;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     private void compileRules(List<Map<AttributeKey<String>, Pattern>> set, List<Map<String, String>> spec) {

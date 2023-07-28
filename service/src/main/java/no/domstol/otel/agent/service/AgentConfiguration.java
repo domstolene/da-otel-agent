@@ -38,6 +38,9 @@ public class AgentConfiguration {
     @JsonProperty("readOnly")
     private boolean readOnly = true;
 
+    @JsonProperty("timestamp")
+    private long timestamp = 0;
+
     @JsonProperty("rules")
     private List<Rule> rules;
 
@@ -97,6 +100,14 @@ public class AgentConfiguration {
 
     public void setSampler(SamplerType sampler) {
         this.sampler = sampler;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public boolean isReadOnly() {

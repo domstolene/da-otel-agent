@@ -27,8 +27,9 @@ public class AgentConfigurationTest {
             {
               "serviceName" : "da-otel-agent-service",
               "sampler" : "parentbased_always_on",
-              "sampleRatio" : 0.1,
+              "sampleRatio" : 0.2,
               "readOnly" : false,
+              "timestamp" : 0,
               "rules" : [ {
                 "exclude" : [ {
                   "http.target" : "/agent-configuration/.+",

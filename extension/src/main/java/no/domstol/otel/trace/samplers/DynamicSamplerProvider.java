@@ -7,12 +7,17 @@ package no.domstol.otel.trace.samplers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -106,6 +111,10 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             try {
                 ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                 AgentConfiguration configuration = mapper.readValue(path.toFile(), AgentConfiguration.class);
+                BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+                Instant lastModifiedTime = attrs.lastModifiedTime().toInstant();
+                ZonedDateTime utcTime = lastModifiedTime.atZone(ZoneId.of("UTC"));
+                configuration.setTimestamp(utcTime.toInstant().toEpochMilli());
                 return configuration;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -172,7 +181,9 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             AgentConfiguration newConfiguration = remoteConfigReader.synchronize(configuration, initialConfig,
                     wrapper.getMetrics());
             if (!newConfiguration.equals(configuration)) {
-                logger.info("Changing configuration and sampler to " + newConfiguration.getSampler());
+                logger.info("Updating sampler configuration from OTEL Configuration Service");
+                System.out.println(configuration);
+                System.out.println(newConfiguration);
                 wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
                 wrapper.setRules(newConfiguration.getRules());
                 configuration = newConfiguration;
@@ -187,7 +198,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             AgentConfiguration newConfiguration = localConfigReader.readConfigurationFile();
             ;
             if (!newConfiguration.equals(configuration)) {
-                logger.info("Changing configuration and sampler to " + newConfiguration.getSampler());
+                logger.info("Updating sampler configuration from file");
                 wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
                 wrapper.setRules(newConfiguration.getRules());
                 configuration = newConfiguration;

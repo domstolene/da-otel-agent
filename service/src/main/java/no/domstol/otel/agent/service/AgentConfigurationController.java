@@ -6,6 +6,7 @@ package no.domstol.otel.agent.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -38,6 +39,9 @@ public class AgentConfigurationController {
         if (getConfigurations().containsKey(configuration.getServiceName())
                 && getConfigurations().get(configuration.getServiceName()).isReadOnly()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
+        }
+        if (configuration.getTimestamp() == 0) {
+            configuration.setTimestamp(Instant.now().toEpochMilli());
         }
         getConfigurations().put(configuration.getServiceName(), configuration);
         return ResponseEntity.created(new URI("/agent-configuration/" + configuration.getServiceName())).build();
