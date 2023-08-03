@@ -3,6 +3,8 @@
 
 This project delivers an [OpenTelemetry Java Agent](https://opentelemetry.io/docs/instrumentation/java/automatic/) including a remotely configurable [sampler](https://opentelemetry.io/docs/concepts/sampling/), along with the accompanying REST service for configuring it. 
 
+![](system.png)
+
 By utilizing a remotely controlled sampler, we can dynamically change its behavior based on the current needs. For example, we could adjust sampling rates or rules, all without having to redeploy or restart our applications – which would normally be the case. If remote control is not desirable, the agent configuration can be set to _read only_. This will still expose the configuration to the service along with any metrics collected. This allowing you to for example. get an idea of how many spans _would be_ sampled if the sampler was set to `always_on`.
 
 The sampler is implemented as an [extension](https://opentelemetry.io/docs/instrumentation/java/automatic/extensions/) to the agent and made use of in a way that allows you to simply replace the existing `opentelemetry-javaagent.jar` with `da-opentelemetry-javaagent.jar`. Existing configurations can be used as is, and making use of the `dynamic` sampler is optional.

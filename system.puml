@@ -1,0 +1,18 @@
+@startuml
+skin rose
+
+actor user as "User"
+component service as "Agent configuration service"
+component prometheus as "Prometheus"
+component collector as "OTEL collector"
+node agent as  "OTEL Agent" {
+ component dynamic as "Dynamic sampler"
+ component delegate as "Delegate sampler"
+ dynamic --> delegate: Delegates
+}
+
+dynamic <--> service : Configuration\n and metrics
+service --> prometheus : Metrics
+agent --> collector
+user --> service : Read and modify configuration
+@enduml
