@@ -112,7 +112,7 @@ Since the configuration service is not started when it's being instrumented, obt
 ```
 opentelemetry-javaagent - version: 1.27.0-SNAPSHOT
 Could not connect to OTEL Configuration Service at http://localhost:8080,
-using sampler "parentbased_always_on".
+using sampler "parentbased_always_off".
 ```
 
 If the OpenTelemetry Configuration Service is available, but does not contain a configuration for the agent, the agent will register itself. You can see this in the log as:
@@ -128,8 +128,8 @@ curl -s -H "X-API-KEY: 0DAE3387-4CDA-417D-B084-53BEC56B7B55"  -X GET http://loca
 [
   {
     "serviceName": "da-otel-agent-service",
-    "sampleRatio": 0.1,
-    "sampler": "parentbased_always_on"
+    "sampleRatio": 0.0,
+    "sampler": "parentbased_always_off"
   }
 ]
 ```
