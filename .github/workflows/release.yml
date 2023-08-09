@@ -13,11 +13,12 @@ env:
   IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
 
 jobs:
-  build-and-test-artifacts:
+  build-and-test-artifacts:  
+
     name: Build and test artifacts
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
