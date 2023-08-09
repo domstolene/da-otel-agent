@@ -1,8 +1,8 @@
-name: Build and publish release
+name: Build and publish release artefacts
 
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
 
 # Defines two custom environment variables for the workflow. These are used for 
