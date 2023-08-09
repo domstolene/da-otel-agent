@@ -2,7 +2,7 @@ name: Build and publish release
 
 on:
   release:
-    types: [published]
+    types: [created]
   workflow_dispatch:
 
 # Defines two custom environment variables for the workflow. These are used for 
