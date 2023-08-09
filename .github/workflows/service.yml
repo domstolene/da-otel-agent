@@ -11,8 +11,8 @@ env:
   IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
 
 jobs:
-  build-and-test-artifacts:
-    name: Build and test artifacts
+  build-and-test:
+    name: Build and test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -61,7 +61,7 @@ jobs:
 
   build-and-push-image:
     name: Build and push image
-    needs: build-and-test-artifacts
+    needs: build-and-test
     runs-on: ubuntu-latest
     permissions:
       contents: read
