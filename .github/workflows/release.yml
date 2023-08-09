@@ -53,6 +53,12 @@ jobs:
         path: extension/build/libs/da-opentelemetry-javaagent.jar
         if-no-files-found: error
 
+    # Attach agent JAR to release as an asset
+    - uses: shogo82148/actions-upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: extension/build/libs/da-opentelemetry-javaagent.jar
+
     # Upload service JAR for use in next job.
     - uses: actions/upload-artifact@v3
       with:
