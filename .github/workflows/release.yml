@@ -44,7 +44,7 @@ jobs:
         GITHUB_ACTOR: ${{ github.actor }}
       with:
         gradle-version: wrapper
-        arguments: publish --no-daemon
+        arguments: build --no-daemon
 
     # Upload extension JAR for use in next job.
     - uses: actions/upload-artifact@v3
