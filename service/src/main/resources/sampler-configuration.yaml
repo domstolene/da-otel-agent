@@ -3,7 +3,8 @@ sampler: parentbased_always_on
 readOnly: false
 rules:
   - exclude:
-    - http.target: "/agent-configuration/.+"
+    - http.target: "/metrics"
       http.method: "GET"
-  - include:
-    - http.method: "POST"
+  - exclude:
+    - http.target: "/metrics/.+"
+      http.method: "POST"
