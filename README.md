@@ -19,7 +19,7 @@ This means that you can adjust your sampling strategy during runtime without hav
 
 The filtering mechanism is applied *before* the underlying sampler recieves its data. It can be used to determine whether or not a span should be created. Note that inclusion takes precedence.
 
-OTEL can automatically add certain pieces of metadata, or "tags", to each piece of data it collects. For HTTP requests, this might include things like the target URL of the request (http.target), or the HTTP method used (http.method). These tags are what is used for the filtering. For example:
+OTEL can add certain pieces of metadata, or [attributes](https://opentelemetry.io/docs/concepts/signals/traces/#attributes), to each [span](https://opentelemetry.io/docs/concepts/signals/traces/#spans) it collects. For HTTP requests, this might include things like the target URL of the request (`http.target`), or the HTTP method used (`http.method`). These attributes are what is used for the filtering. For example:
 
 ```yaml
 rules:
@@ -32,13 +32,13 @@ rules:
     - http.method: "POST"
 ```
 
-In this example all HTTP `GET` calls to the health and metrics endpoints are ignored, while all `POST` calls are sampled, regardless of what the underlying sampler decides should be sampled or not. If the tags does not match any of these rules, it is up to the underlying sampler to determine whether or not the span should be created.
+In this example all HTTP `GET` calls to the health and metrics endpoints are ignored, while all `POST` calls are sampled, regardless of what the underlying sampler decides should be sampled or not. If the attributes does not match any of these rules, it is up to the underlying sampler to determine whether or not the span should be created.
 
-More than one tag can be specified in each rule, and all must match for the rule to trigger. Also notice that Java regular expressions can be used.
+More than one attribute can be specified in each rule, and all must match for the rule to trigger. Also notice that Java regular expressions can be used.
 
-## The Configuration Service
+## The Agent Configuration Service
 
-The _OpenTelemetry Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API supports all the common REST verbs except `PATCH`. The endpoints are as follows:
+The _OpenTelemetry Agent Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API supports all the common REST verbs except `PATCH`. The endpoints are as follows:
 
 * `POST /agent-configuration` – Posts a _new_ agent configuration. The configuration must be in the payload.
 * `GET /agent-configuration/<id>` – Returns an agent configuration or 404 if not found.
@@ -124,7 +124,7 @@ Self-registered as "da-otel-agent-service" at the OTEL Configuration Service
 Now getting the available configurations from the service will a JSON array with all the agent configurations:
 
 ```
-curl -s -H "X-API-KEY: 0DAE3387-4CDA-417D-B084-53BEC56B7B55"  -X GET http://localhost:8080/agent-configuration | jq
+curl -s -X GET http://localhost:8080/agent-configuration | jq
 [
   {
     "serviceName": "da-otel-agent-service",
@@ -137,7 +137,7 @@ curl -s -H "X-API-KEY: 0DAE3387-4CDA-417D-B084-53BEC56B7B55"  -X GET http://loca
 In order to test the agent and the service you can execute the following to turn on sampling:
 
 ```bash
-curl -H "X-API-KEY: 0DAE3387-4CDA-417D-B084-53BEC56B7B55" -X POST http://localhost:8080/agent-configuration \
+curl -X POST http://localhost:8080/agent-configuration \
   -H 'Content-Type: application/json' \
   -d '{"serviceName":"da-otel-agent-service", "sampler":"always_on"}'
 ```
