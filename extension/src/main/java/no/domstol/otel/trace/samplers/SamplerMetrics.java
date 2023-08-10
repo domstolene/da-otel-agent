@@ -1,3 +1,7 @@
+/*
+ * Copyright Domstoladministrasjonen, Norway
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package no.domstol.otel.trace.samplers;
 
 import java.util.concurrent.atomic.AtomicLong;

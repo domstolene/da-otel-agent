@@ -1,3 +1,7 @@
+/*
+ * Copyright Domstoladministrasjonen, Norway
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package no.domstol.otel.agent.configuration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
