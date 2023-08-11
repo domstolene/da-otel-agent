@@ -27,25 +27,24 @@ import io.opentelemetry.api.common.AttributeKey;
 
 public class AgentConfigurationTest {
 
-    private String json = """
-            {
-              "serviceName" : "da-otel-agent-service",
-              "sampler" : "parentbased_always_on",
-              "sampleRatio" : 0.2,
-              "readOnly" : false,
-              "timestamp" : 0,
-              "rules" : [ {
-                "exclude" : [ {
-                  "http.target" : "/agent-configuration/.+",
-                  "http.method" : "GET"
-                } ]
-              }, {
-                "include" : [ {
-                  "http.method" : "POST"
-                } ]
-              } ]
-            }
-            """.trim();
+    private String json =
+            "{\n" +
+            "  \"serviceName\" : \"da-otel-agent-service\",\n" +
+            "  \"sampler\" : \"parentbased_always_on\",\n" +
+            "  \"sampleRatio\" : 0.2,\n" +
+            "  \"readOnly\" : false,\n" +
+            "  \"timestamp\" : 0,\n" +
+            "  \"rules\" : [ {\n" +
+            "    \"exclude\" : [ {\n" +
+            "      \"http.target\" : \"/agent-configuration/.+\",\n" +
+            "      \"http.method\" : \"GET\"\n" +
+            "    } ]\n" +
+            "  }, {\n" +
+            "    \"include\" : [ {\n" +
+            "      \"http.method\" : \"POST\"\n" +
+            "    } ]\n" +
+            "  } ]\n" +
+            "}";
 
     @Test
     public void testSetAndGetServiceName() {
@@ -85,7 +84,7 @@ public class AgentConfigurationTest {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         Path file = Paths.get("src", "test", "resources", "traces-configuration.yaml");
         AgentConfiguration configuration = yamlMapper.readValue(file.toFile(), AgentConfiguration.class);
-        assertTrue(json.equals(configuration.toString()));
+        assertEquals(json, configuration.toString());
     }
 
     @Test
