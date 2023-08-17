@@ -105,7 +105,7 @@ Notice that `otel.traces.sampler` must be set to `dynamic`, while the `sampler` 
 
 In order to test this setup, first start Jaeger and Prometheus by calling `docker compose up` found in the root folder. This will start a new Jaeger instance in Docker and expose port 4317 for tracing and <a href="http://localhost:16686">http://localhost:16686</a> for the UI. The Prometheus UI will be available at <a href="http://localhost:9090">http://localhost:9090</a>
 
-Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service instrumented using the built agent. Note that the service has been configured to add a bit of security using an API key.
+Now run `build-and-test.sh`. This will build the agent and the service, run the tests and start the service instrumented using the built agent.
 
 Since the configuration service is not started when it's being instrumented, obtaining the remote configuration will fail and defaults will be used. You will see something like this in the log:
 
