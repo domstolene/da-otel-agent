@@ -170,20 +170,18 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
             configuration = remoteConfigReader.synchronize(configuration, config, null);
             wrapper = new DynamicSamplerWrapper(getConfiguredSampler(configuration), configuration.getRules());
             executor = Executors.newScheduledThreadPool(1);
-            executor.scheduleWithFixedDelay(DynamicSamplerProvider::updateConfigurationFromService, 5, 30,
+            executor.scheduleWithFixedDelay(DynamicSamplerProvider::synchronizeWithConfigurationService, 5, 30,
                     TimeUnit.SECONDS);
         }
         return wrapper;
     }
 
-    private static void updateConfigurationFromService() {
+    private static void synchronizeWithConfigurationService() {
         try {
             AgentConfiguration newConfiguration = remoteConfigReader.synchronize(configuration, initialConfig,
                     wrapper.getMetrics());
-            if (!newConfiguration.equals(configuration)) {
+            if (!configuration.isReadOnly() && !newConfiguration.equals(configuration)) {
                 logger.info("Updating sampler configuration from OTEL Configuration Service");
-                System.out.println(configuration);
-                System.out.println(newConfiguration);
                 wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
                 wrapper.setRules(newConfiguration.getRules());
                 configuration = newConfiguration;

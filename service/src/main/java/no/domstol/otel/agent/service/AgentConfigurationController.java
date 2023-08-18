@@ -13,7 +13,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,10 +35,6 @@ public class AgentConfigurationController {
     @PostMapping("/agent-configuration")
     public ResponseEntity<String> addAgentConfiguration(@RequestBody AgentConfiguration configuration)
             throws URISyntaxException {
-        if (getConfigurations().containsKey(configuration.getServiceName())
-                && getConfigurations().get(configuration.getServiceName()).isReadOnly()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
-        }
         if (configuration.getTimestamp() == 0) {
             configuration.setTimestamp(Instant.now().toEpochMilli());
         }
@@ -61,9 +56,6 @@ public class AgentConfigurationController {
         if (!getConfigurations().containsKey(agentName)) {
             return ResponseEntity.notFound().build();
         }
-        if (getConfigurations().get(agentName).isReadOnly()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
-        }
         getConfigurations().put(configuration.getServiceName(), configuration);
         return ResponseEntity.ok().build();
     }
@@ -73,9 +65,6 @@ public class AgentConfigurationController {
         if (!getConfigurations().containsKey(configuration.getServiceName())) {
             return ResponseEntity.notFound().build();
         }
-        if (getConfigurations().get(configuration.getServiceName()).isReadOnly()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
-        }
         getConfigurations().put(configuration.getServiceName(), configuration);
         return ResponseEntity.ok().build();
     }
@@ -84,9 +73,6 @@ public class AgentConfigurationController {
     public ResponseEntity<String> deleteAgentConfiguration(@PathVariable String agentName) {
         if (!getConfigurations().containsKey(agentName)) {
             return ResponseEntity.notFound().build();
-        }
-        if (getConfigurations().get(agentName).isReadOnly()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This configuration is read-only");
         }
         getConfigurations().remove(agentName);
         return ResponseEntity.ok().build();
