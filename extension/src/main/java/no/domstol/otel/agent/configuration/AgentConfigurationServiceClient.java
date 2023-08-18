@@ -89,7 +89,8 @@ public class AgentConfigurationServiceClient {
                         // while we're at it, post the metrics
                         postMetrics(localConfig.getServiceName(), configurationServiceUrl, apiKey, metrics);
                         // if the local configuration does not have a timestamp,
-                        // it's the initial/default one and we should use the remote version
+                        // it has not been read from a file and we should use
+                        // the remote version
                         if (localConfig.getTimestamp() == 0) {
                             return remoteConfig;
                         }
@@ -97,7 +98,7 @@ public class AgentConfigurationServiceClient {
                         // from a file that is more current, so we should update
                         // the remote configuration
                         if (localConfig.getTimestamp() > remoteConfig.getTimestamp()) {
-                            update(localConfig, configurationServiceUrl, apiKey);
+                            updateRemoteConfiguration(localConfig, configurationServiceUrl, apiKey);
                             return localConfig;
                         }
                         return remoteConfig;
@@ -116,7 +117,7 @@ public class AgentConfigurationServiceClient {
         return localConfig;
     }
 
-    private void update(AgentConfiguration configuration, String configurationServiceUrl, String apiKey)
+    private void updateRemoteConfiguration(AgentConfiguration configuration, String configurationServiceUrl, String apiKey)
             throws UnsupportedCharsetException, JsonProcessingException {
         HttpPut request = new HttpPut(configurationServiceUrl + "/agent-configuration");
         if (apiKey != null)
