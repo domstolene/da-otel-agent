@@ -215,6 +215,17 @@ public class AgentConfiguration {
             return false;
         AgentConfiguration other = (AgentConfiguration) obj;
         return Objects.equals(rules, other.rules) && Objects.equals(sampleRatio, other.sampleRatio)
+                && sampler == other.sampler && Objects.equals(serviceName, other.serviceName)
+                && Objects.equals(readOnly, other.isReadOnly());
+    }
+
+    public boolean equalsIgnoreReadOnly(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        AgentConfiguration other = (AgentConfiguration) obj;
+        return Objects.equals(rules, other.rules) && Objects.equals(sampleRatio, other.sampleRatio)
                 && sampler == other.sampler && Objects.equals(serviceName, other.serviceName);
     }
 

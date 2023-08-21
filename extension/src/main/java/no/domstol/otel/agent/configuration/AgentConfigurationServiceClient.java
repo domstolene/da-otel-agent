@@ -49,6 +49,7 @@ import no.domstol.otel.trace.samplers.SamplerMetrics;
 public class AgentConfigurationServiceClient {
 
     private static final String API_KEY_HEADER = "X-API-KEY";
+    private static final String USER_AGENT_HEADER = "AgentConfigurationServiceClient/1.2";
     private static final Logger logger = Logger.getLogger(AgentConfigurationServiceClient.class.getName());
     private static final CloseableHttpClient httpClient = HttpClients.createDefault();
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -76,6 +77,7 @@ public class AgentConfigurationServiceClient {
             HttpGet request = new HttpGet(
                     configurationServiceUrl + "/agent-configuration/" + localConfig.getServiceName());
             request.addHeader("Accept", "application/json");
+            request.setHeader("User-Agent", USER_AGENT_HEADER);
             if (apiKey != null)
                 request.addHeader(API_KEY_HEADER, apiKey);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -119,9 +121,11 @@ public class AgentConfigurationServiceClient {
 
     private void updateRemoteConfiguration(AgentConfiguration configuration, String configurationServiceUrl, String apiKey)
             throws UnsupportedCharsetException, JsonProcessingException {
-        HttpPut request = new HttpPut(configurationServiceUrl + "/agent-configuration");
+        HttpPut request = new HttpPut(
+                configurationServiceUrl + "/agent-configuration/" + configuration.getServiceName());
         if (apiKey != null)
             request.addHeader(API_KEY_HEADER, apiKey);
+        request.setHeader("User-Agent", USER_AGENT_HEADER);
         request.setEntity(new StringEntity(objectMapper.writeValueAsString(configuration),
                 ContentType.APPLICATION_JSON.withCharset("UTF-8")));
         try (CloseableHttpResponse execute = httpClient.execute(request)) {
@@ -143,6 +147,7 @@ public class AgentConfigurationServiceClient {
             HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
             if (apiKey != null)
                 postRequest.addHeader(API_KEY_HEADER, apiKey);
+            postRequest.setHeader("User-Agent", USER_AGENT_HEADER);
             postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(configuration),
                     ContentType.APPLICATION_JSON.withCharset("UTF-8")));
             try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
@@ -163,6 +168,7 @@ public class AgentConfigurationServiceClient {
         HttpPost postRequest = new HttpPost(configurationServiceUrl + "/metrics/" + serviceName);
         if (apiKey != null)
             postRequest.addHeader(API_KEY_HEADER, apiKey);
+        postRequest.setHeader("User-Agent", USER_AGENT_HEADER);
         postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(metrics.copyAndClear()),
                 ContentType.APPLICATION_JSON.withCharset("UTF-8")));
         try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
