@@ -49,7 +49,7 @@ public class AgentConfiguration {
     private Double sampleRatio = 0.0;
 
     @JsonProperty("readOnly")
-    private boolean readOnly = true;
+    private boolean readOnly = false;
 
     @JsonProperty("timestamp")
     private long timestamp = 0;

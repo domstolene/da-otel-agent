@@ -193,7 +193,10 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
         try {
             AgentConfiguration newConfiguration = remoteConfigReader.synchronize(configuration, initialConfig,
                     wrapper.getMetrics());
-            if (!configuration.isReadOnly() && !newConfiguration.equals(configuration)) {
+            if (!configuration.isReadOnly() && !newConfiguration.equalsIgnoreReadOnly(configuration)) {
+                // must override this since it is the local configuration that
+                // decides whether or not the flag should be set
+                configuration.setReadOnly(false);
                 logger.info("Updating sampler configuration from OTEL Configuration Service");
                 wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
                 wrapper.setRules(newConfiguration.getRules());
@@ -207,11 +210,12 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
     private static void updateConfigurationFromFile() {
         try {
             AgentConfiguration newConfiguration = localConfigReader.readConfigurationFile();
-            ;
             if (!newConfiguration.equals(configuration)) {
                 logger.info("Updating sampler configuration from file");
                 wrapper.setCurrentSampler(getConfiguredSampler(newConfiguration));
                 wrapper.setRules(newConfiguration.getRules());
+                if (configuration.isReadOnly() != newConfiguration.isReadOnly())
+                    logger.info("Read only state is now " + newConfiguration.isReadOnly());
                 configuration = newConfiguration;
             }
         } catch (Exception e) {

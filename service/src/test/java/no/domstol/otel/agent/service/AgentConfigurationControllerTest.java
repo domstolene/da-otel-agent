@@ -45,6 +45,8 @@ public class AgentConfigurationControllerTest {
 
     private MockMvc mockMvc;
 
+    private static final String USER_AGENT_HEADER = "AgentConfigurationServiceClient/1.2";
+
     @InjectMocks
     private AgentConfigurationController agentConfigurationController;
 
@@ -62,15 +64,24 @@ public class AgentConfigurationControllerTest {
         AgentConfiguration agentConfiguration = new AgentConfiguration();
         agentConfiguration.setServiceName("testAgent");
         agentConfiguration.setReadOnly(false);
-        configurations.put(agentConfiguration.getServiceName(), agentConfiguration);
 
+        // First pass should return 201 CREATED
         mockMvc.perform(post("/agent-configuration")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", "MyUserAgent")
                 .content(asJsonString(agentConfiguration)))
                 .andExpect(status().isCreated());
 
         // Verify that the configuration has been added
-        assert(configurations.containsKey("testAgent"));
+        assert (configurations.containsKey("testAgent"));
+
+        // Second pass should return 409 CONFLICT since the resource is already
+        // present. Use POST to update existing configurations
+        mockMvc.perform(post("/agent-configuration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", "MyUserAgent")
+                .content(asJsonString(agentConfiguration)))
+                .andExpect(status().is(409));
     }
 
     @Test
@@ -80,9 +91,38 @@ public class AgentConfigurationControllerTest {
         configurations.put(agentConfiguration.getServiceName(), agentConfiguration);
 
         mockMvc.perform(get("/agent-configuration/testAgent")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", "MyUserAgent"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.serviceName", is("testAgent")));
+    }
+
+    @Test
+    public void testModifyReadOnlyAgentConfiguration() throws Exception {
+        AgentConfiguration agentConfiguration = new AgentConfiguration();
+        agentConfiguration.setServiceName("testAgent");
+        agentConfiguration.setReadOnly(true);
+
+        // First post should be OK – it is for creating the config
+        mockMvc.perform(post("/agent-configuration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", USER_AGENT_HEADER)
+                .content(asJsonString(agentConfiguration)))
+                .andExpect(status().isCreated());
+
+        // This should fail because we use a unrecognized client
+        mockMvc.perform(put("/agent-configuration/testAgent")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", "MyUserAgent")
+                .content(asJsonString(agentConfiguration)))
+                .andExpect(status().isForbidden());
+
+        // This should pass because we use a recognized client
+        mockMvc.perform(put("/agent-configuration/testAgent")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", USER_AGENT_HEADER)
+                .content(asJsonString(agentConfiguration)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -98,6 +138,7 @@ public class AgentConfigurationControllerTest {
 
         mockMvc.perform(put("/agent-configuration/testAgent")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", "MyUserAgent")
                 .content(asJsonString(newConfiguration)))
                 .andExpect(status().isOk());
 
@@ -116,7 +157,8 @@ public class AgentConfigurationControllerTest {
         configurations.put(agentConfiguration2.getServiceName(), agentConfiguration2);
 
         mockMvc.perform(get("/agent-configuration")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("User-Agent", "MyUserAgent"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].serviceName", is("testAgent1")))
