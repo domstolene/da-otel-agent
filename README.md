@@ -43,7 +43,6 @@ The _OpenTelemetry Agent Configuration Service_ is a component of this project t
 * `POST /agent-configuration` – Posts a _new_ agent configuration. The configuration must be in the payload.
 * `GET /agent-configuration/<id>` – Returns an agent configuration or 404 if not found.
 * `PUT /agent-configuration/<id>` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
-* `PUT /agent-configuration` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
 * `DELETE /agent-configuration/<id>` – Deletes the agent configuration.
 * `GET /agent-configuration` – Returns all agent configurations.
 
