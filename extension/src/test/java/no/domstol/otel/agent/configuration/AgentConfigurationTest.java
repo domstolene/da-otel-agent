@@ -30,7 +30,7 @@ public class AgentConfigurationTest {
     private String json =
             "{\n" +
             "  \"serviceName\" : \"da-otel-agent-service\",\n" +
-            "  \"sampler\" : \"parentbased_always_on\",\n" +
+            "  \"sampler\" : \"parentbased_always_off\",\n" +
             "  \"sampleRatio\" : 0.2,\n" +
             "  \"readOnly\" : false,\n" +
             "  \"timestamp\" : 0,\n" +
