@@ -19,6 +19,7 @@ package no.domstol.otel.agent.configuration;
 
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.http.HttpEntity;
@@ -91,8 +92,8 @@ public class AgentConfigurationServiceClient {
                         // while we're at it, post the metrics
                         postMetrics(localConfig.getServiceName(), configurationServiceUrl, apiKey, metrics);
                         // if the local configuration does not have a timestamp,
-                        // it has not been read from a file and we should use
-                        // the remote version
+                        // it is the default version, has not been read from a
+                        // file and we should use the remote version
                         if (localConfig.getTimestamp() == 0) {
                             return remoteConfig;
                         }
@@ -113,8 +114,8 @@ public class AgentConfigurationServiceClient {
                 }
             }
         } catch (Exception e) {
-            logger.severe("Could not connect to OTEL Configuration Service at " + configurationServiceUrl
-                    + ", using sampler \"" + localConfig.getSampler() + "\".");
+            logger.log(Level.SEVERE, "Could not connect to OTEL Configuration Service at " + configurationServiceUrl
+                    + ", using sampler \"" + localConfig.getSampler() + "\".", e);
         }
         return localConfig;
     }
@@ -138,7 +139,7 @@ public class AgentConfigurationServiceClient {
                                 + statusCode);
             }
         } catch (Exception e) {
-            logger.severe("Failed to upload current configuration to the OTEL Configuration Service");
+            logger.log(Level.SEVERE, "Failed to upload current configuration to the OTEL Configuration Service", e);
         }
     }
 
@@ -159,7 +160,7 @@ public class AgentConfigurationServiceClient {
                     logger.severe("Self registering failed with status code: " + statusCode);
                 }
             } catch (Exception e) {
-                logger.severe("Failed to self-register at the OTEL Configuration Service");
+                logger.log(Level.SEVERE, "Failed to self-register at the OTEL Configuration Service", e);
             }
     }
 
