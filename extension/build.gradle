@@ -1,7 +1,7 @@
 plugins {
   id "java"
   id "com.github.johnrengelman.shadow" version "8.1.1"
-  id 'maven-publish'
+  id "maven-publish"
 }
 
 sourceCompatibility = 11
@@ -12,9 +12,9 @@ ext {
     opentelemetrySdk           : "1.29.0",
     opentelemetryJavaagent     : "1.29.0",
   ]
-  jarToPublish = file( 'build/libs/da-opentelemetry-javaagent.jar' )
+  jarToPublish = file( "build/libs/da-opentelemetry-javaagent.jar" )
   deps = [
-    autoservice: dependencies.create(group: 'com.google.auto.service', name: 'auto-service', version: '1.1.1')
+    autoservice: dependencies.create(group: "com.google.auto.service", name: "auto-service", version: "1.1.1")
   ]
 }
 
@@ -59,8 +59,8 @@ dependencies {
     because during runtime all necessary classes are provided by javaagent
     itself.
    */
-  compileOnly 'io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi'
-  compileOnly 'io.opentelemetry:opentelemetry-exporter-otlp'
+  compileOnly "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi"
+  compileOnly "io.opentelemetry:opentelemetry-exporter-otlp"
 
   /*
     Provides @AutoService annotation that makes registration of our SPI
@@ -72,15 +72,16 @@ dependencies {
   /*
     These dependencies are required both during compile and runtime.
   */
-  implementation 'org.apache.commons:commons-lang3:3.12.0'
-  implementation 'org.apache.httpcomponents:httpclient:4.5.14'
-  implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-  implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
+  implementation "org.apache.commons:commons-lang3:3.12.0"
+  implementation "org.apache.httpcomponents:httpclient:4.5.14"
+  implementation "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2"
+
   /*
   For tests
   */
-  testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
-  testImplementation 'io.opentelemetry:opentelemetry-api:${versions.opentelemetrySdk}'
+  testImplementation "org.junit.jupiter:junit-jupiter-engine:5.9.3"
+  testImplementation "io.opentelemetry:opentelemetry-api:${versions.opentelemetrySdk}"
 
 
   // Otel Java instrumentation that we use and extend during integration tests
@@ -104,7 +105,7 @@ task extendedAgent(type: Jar) {
   doFirst {
     manifest.from(
       zipTree(configurations.otel.singleFile).matching {
-        include 'META-INF/MANIFEST.MF'
+        include "META-INF/MANIFEST.MF"
       }.singleFile
     )
   }
