@@ -48,7 +48,7 @@ public class AgentConfigurationController {
 
     private ConcurrentMap<String, AgentConfiguration> configurations = new ConcurrentHashMap<>();
 
-    private static String CLIENT_ID = "AgentConfigurationServiceClient/1.2";
+    private static String CLIENT_ID = "AgentConfigurationServiceClient/1.3";
 
     @PostMapping("/agent-configuration")
     public ResponseEntity<String> addAgentConfiguration(@RequestHeader("User-Agent") String userAgent,

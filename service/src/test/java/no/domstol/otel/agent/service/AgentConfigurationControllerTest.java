@@ -45,7 +45,7 @@ public class AgentConfigurationControllerTest {
 
     private MockMvc mockMvc;
 
-    private static final String USER_AGENT_HEADER = "AgentConfigurationServiceClient/1.2";
+    private static final String USER_AGENT_HEADER = "AgentConfigurationServiceClient/1.3";
 
     @InjectMocks
     private AgentConfigurationController agentConfigurationController;
@@ -76,7 +76,7 @@ public class AgentConfigurationControllerTest {
         assert (configurations.containsKey("testAgent"));
 
         // Second pass should return 409 CONFLICT since the resource is already
-        // present. Use POST to update existing configurations
+        // present. Use PUT to update existing configurations
         mockMvc.perform(post("/agent-configuration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("User-Agent", "MyUserAgent")
@@ -117,7 +117,8 @@ public class AgentConfigurationControllerTest {
                 .content(asJsonString(agentConfiguration)))
                 .andExpect(status().isForbidden());
 
-        // This should pass because we use a recognized client
+        // This should pass because we use a recognized client which is allowed
+        // to override the read only flag.
         mockMvc.perform(put("/agent-configuration/testAgent")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("User-Agent", USER_AGENT_HEADER)
