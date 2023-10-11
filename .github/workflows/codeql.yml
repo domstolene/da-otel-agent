@@ -50,14 +50,14 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         
-    - name: Gradle validate wrapper
-      uses: gradle/wrapper-validation-action@v1
-
-    - name: Gradle build
-      uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: wrapper
-        arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
+#    - name: Gradle validate wrapper
+#      uses: gradle/wrapper-validation-action@v1
+#
+#    - name: Gradle build
+#      uses: gradle/gradle-build-action@v2
+#      with:
+#        gradle-version: wrapper
+#        arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
         
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -71,6 +71,11 @@ jobs:
         # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
 
+    # Autobuild attempts to build any compiled languages (C/C++, C#, Go, Java, or Swift).
+    # If this step fails, then you should remove it and run the build manually (see below)
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+      
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
