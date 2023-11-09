@@ -10,6 +10,11 @@ on:
 jobs:
   trivy_scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -32,6 +37,7 @@ jobs:
   
     - name: Build an image from Dockerfile
       run: |
+        cp extension/build/libs/da-opentelemetry-javaagent.jar .
         cp service/build/libs/service.jar .
         docker build -t da-otel-agent-configuration-service:${{ github.sha }} .
         
@@ -41,6 +47,7 @@ jobs:
         image-ref: da-otel-agent-configuration-service:${{ github.sha }}
         format: 'sarif'
         output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v2
