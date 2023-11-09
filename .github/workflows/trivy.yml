@@ -47,6 +47,7 @@ jobs:
         image-ref: da-otel-agent-configuration-service:${{ github.sha }}
         format: 'sarif'
         output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v2
