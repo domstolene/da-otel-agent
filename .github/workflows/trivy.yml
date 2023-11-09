@@ -48,6 +48,7 @@ jobs:
         scan-type: 'image'
         format: 'template'
         template: '@/contrib/sarif.tpl'
+        exit-code: '1'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
 
