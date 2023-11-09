@@ -45,6 +45,7 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: da-otel-agent-configuration-service:${{ github.sha }}
+        scan-type: image
         format: 'template'
         template: '@/contrib/sarif.tpl'
         output: 'trivy-results.sarif'
