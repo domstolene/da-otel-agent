@@ -45,7 +45,8 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: da-otel-agent-configuration-service:${{ github.sha }}
-        format: 'sarif'
+        format: 'template'
+        template: '@/contrib/sarif.tpl'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
 
