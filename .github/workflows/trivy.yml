@@ -32,6 +32,7 @@ jobs:
   
     - name: Build an image from Dockerfile
       run: |
+        cp extension/build/libs/da-opentelemetry-javaagent.jar .
         cp service/build/libs/service.jar .
         docker build -t da-otel-agent-configuration-service:${{ github.sha }} .
         
