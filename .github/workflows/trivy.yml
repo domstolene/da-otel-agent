@@ -46,8 +46,7 @@ jobs:
       with:
         image-ref: da-otel-agent-configuration-service:${{ github.sha }}
         scan-type: 'image'
-        format: 'template'
-        template: '@/contrib/sarif.tpl'
+        format: 'sarif'
         exit-code: '1'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
