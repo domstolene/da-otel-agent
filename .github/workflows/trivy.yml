@@ -35,10 +35,20 @@ jobs:
         gradle-version: wrapper
         arguments: build --no-daemon
           
+        arguments: build --no-daemon
+
+    - name: Build an image from Dockerfile
+      run: |
+        cp extension/build/libs/da-opentelemetry-javaagent.jar .
+        cp service/build/libs/service.jar .
+        docker build -t da-otel-agent-configuration-service:${{ github.sha }} .
+        
+
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        scan-type: 'fs'
+        image-ref: da-otel-agent-configuration-service:${{ github.sha }}
+        scan-type: 'image'
         format: 'sarif'
         ignore-unfixed: true
         output: 'trivy-results.sarif'
