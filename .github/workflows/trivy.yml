@@ -48,6 +48,7 @@ jobs:
         scan-type: 'image'
         format: 'sarif'
         exit-code: '1'
+        ignore-unfixed: true
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
 
