@@ -15,6 +15,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "io.micrometer:micrometer-core:1.11.1"
     implementation "io.micrometer:micrometer-registry-prometheus:1.11.1"
+    implementation 'com.h2database:h2:1.4.197'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 
