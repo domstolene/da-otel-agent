@@ -1,0 +1,18 @@
+subprojects {
+  dependencyLocking {
+    lockAllConfigurations()
+  }
+}
+
+task upgradeDependencies(type: Exec) {
+  List<Object> commandPartsList = new ArrayList<>()
+  commandPartsList.add("./gradlew")
+  getRootProject().getSubprojects().stream()
+    .map(Project::getName)
+    .forEach(projectName -> {
+      commandPartsList.add(String.format("%s:dependencies", projectName))
+      commandPartsList.add("--write-locks")
+  })
+  Object[] commandParts = commandPartsList.toArray(new Object[commandPartsList.size()])
+  commandLine commandParts
+}
