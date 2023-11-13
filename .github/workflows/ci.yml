@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-and-test:
@@ -29,7 +29,7 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: wrapper
-        arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
+        arguments: build --no-daemon--write-locks -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
 
     - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
       uses: aquasecurity/trivy-action@master
