@@ -4,6 +4,15 @@ plugins {
     id "java"
 }
 
+configurations {
+    compileClasspath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+    runtimeClasspath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
+
 sourceCompatibility = 17
 targetCompatibility = 17
 
