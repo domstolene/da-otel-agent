@@ -7,6 +7,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   trivy_scan:
     runs-on: ubuntu-latest
@@ -14,6 +17,7 @@ jobs:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      pull-requests: write # required for adding pull request comments
       
     steps:
     - name: Checkout repository
@@ -34,18 +38,31 @@ jobs:
         gradle-version: wrapper
         arguments: build --no-daemon
 
+    ############################################################################
+    # Run Trivy on file system and add report as GitHub PR Comment
+    ############################################################################
+    - name: Trivy Scan and Report
+      uses: domstolene/trivy-pr-report@main
+      with:
+        github_token: ${{ github.token }}
+
+    ############################################################################
+    # Basically do the same thing again, but this time upload the sarif-file
+    # so that the scanning results are available in the Security/Code Scanning
+    # page on the GitHub project site. This requires that "Code Scanning" is
+    # available for the repo.
+    ############################################################################
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         format: 'sarif'
-        ignore-unfixed: true
+        # ignore-unfixed: true
         output: 'trivy-results.sarif'
-        exit-code: '1'
-        severity: 'CRITICAL,HIGH'
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v2
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
+
