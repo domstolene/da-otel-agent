@@ -45,7 +45,7 @@ jobs:
       uses: domstolene/trivy-pr-report@main
       with:
         github_token: ${{ github.token }}
-        scan_ref: ${{ github.workspace }}
+        scan_ref: $GITHUB_WORKSPACE
 
     ############################################################################
     # Basically do the same thing again, but this time upload the sarif-file
