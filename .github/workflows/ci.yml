@@ -31,18 +31,8 @@ jobs:
         gradle-version: wrapper
         arguments: build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
 
-    - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: "fs"
-        format: "github"
-        output: 'dependency-results.sbom.json'
-        image-ref: "."
-        github-pat: ${{ secrets.GITHUB_TOKEN }}
-
     - uses: actions/upload-artifact@v3
       with:
         name: da-opentelemetry-javaagent.jar
         path: extension/build/libs/da-opentelemetry-javaagent.jar
         if-no-files-found: error
-
