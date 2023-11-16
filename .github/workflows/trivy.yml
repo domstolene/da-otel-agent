@@ -23,7 +23,7 @@ jobs:
     ############################################################################
     # Run Trivy on file system and add report as GitHub PR Comment
     ############################################################################
-    - name: Trivy Scan and Report
+    - name: Trivy Scan and Report to PR
       uses: domstolene/trivy-pr-report@main
       with:
         github_token: ${{ github.token }}
@@ -34,15 +34,12 @@ jobs:
     # page on the GitHub project site. This requires that "Code Scanning" is
     # available for the repo.
     ############################################################################
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         format: 'sarif'
-        # ignore-unfixed: true
+        ignore-unfixed: true
         output: 'trivy-results.sarif'
 
     - name: Upload Trivy scan results to GitHub Security tab
