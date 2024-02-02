@@ -77,7 +77,7 @@ public class MetricsController {
         return registry.scrape();
     }
 
-    @PostMapping("{serviceName}")
+    @PostMapping(path = "{serviceName}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<String> handleRequest(@PathVariable String serviceName, @RequestBody SamplerMetrics metrics) {
         // must be done first or the registry will get confused and hide metrics.
         if (registered == false) {
