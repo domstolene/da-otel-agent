@@ -17,6 +17,8 @@
  */
 package no.domstol.otel.agent.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -33,13 +35,16 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(RestExceptionHandler.class);
+
     @Override
     @Nullable
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-
         APIError errorResponse = new APIError(ex.getMessage(), status.value(), path);
+        logger.error("{} {} at {} from user agent {}", status.value(), ex.getMostSpecificCause().getMessage(), path,
+                headers.get("User-Agent"));
         return new ResponseEntity<>(errorResponse, headers, status);
     }
 
