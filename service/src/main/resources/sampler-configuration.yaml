@@ -1,6 +1,6 @@
 serviceName: da-otel-agent-service
 sampler: "parentbased_traceidratio"
-sampleRatio: 0.01
+sampleRatio: 0.001
 readOnly: false
 rules:
   - exclude:

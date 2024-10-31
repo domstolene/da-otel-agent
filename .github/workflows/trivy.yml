@@ -21,7 +21,7 @@ jobs:
     # Run Trivy on file system and add report as GitHub PR Comment
     ############################################################################
     - name: Trivy Scan and Report to PR
-      uses: domstolene/trivy-pr-report@main
+      uses: domstolene/trivy-pr-report@v1.4.0
       with:
         github_token: ${{ github.token }}
 
