@@ -84,12 +84,12 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Download da-opentelemetry-javaagent.jar from previous job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: da-opentelemetry-javaagent.jar
 
       - name: Download service.jar from previous job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: service.jar
 
