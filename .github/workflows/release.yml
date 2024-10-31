@@ -48,7 +48,7 @@ jobs:
         arguments: publish --no-daemon
 
     # Upload extension JAR for use in next job.
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: da-opentelemetry-javaagent.jar
         path: extension/build/libs/da-opentelemetry-javaagent.jar
@@ -61,7 +61,7 @@ jobs:
         asset_path: extension/build/libs/da-opentelemetry-javaagent.jar
 
     # Upload service JAR for use in next job.
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: service.jar
         path: service/build/libs/service.jar
