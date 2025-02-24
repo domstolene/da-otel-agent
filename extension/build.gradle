@@ -9,8 +9,8 @@ targetCompatibility = 11
 
 ext {
   versions = [
-    opentelemetrySdk           : "1.29.0",
-    opentelemetryJavaagent     : "1.29.0",
+    opentelemetrySdk           : "1.41.0",
+    opentelemetryJavaagent     : "1.33.6",
   ]
   jarToPublish = file( "build/libs/da-opentelemetry-javaagent.jar" )
   deps = [
@@ -41,7 +41,7 @@ publishing {
     maven(MavenPublication) {
       groupId = "no.domstolene"
       artifactId = "da-opentelemetry-javaagent"
-      version = "1.4.0"
+      version = "1.5.0"
       artifact jarToPublish
     }
   }
