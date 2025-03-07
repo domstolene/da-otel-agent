@@ -7,5 +7,4 @@ build
 # Other files to Ignore
 .asciidoctorconfig.adoc
 .java-version
-/.DS_Store
 
