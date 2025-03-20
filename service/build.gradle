@@ -36,6 +36,7 @@ bootJar {
 }
 jar {
     enabled = true
+    archiveFileName.set("service.jar")
 }
 test {
     useJUnitPlatform()
