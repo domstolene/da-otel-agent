@@ -1,4 +1,4 @@
-name: Build and publish release artefacts
+name: Build and publish release
 
 on:
   release:

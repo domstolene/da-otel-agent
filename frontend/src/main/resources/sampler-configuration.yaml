@@ -1,0 +1,11 @@
+serviceName: da-otel-agent-frontend
+sampler: "parentbased_traceidratio"
+sampleRatio: 0.001
+readOnly: false
+rules:
+  - exclude:
+    - http.target: "/metrics"
+      http.method: "GET"
+  - exclude:
+    - http.target: "/metrics/.+"
+      http.method: "POST"

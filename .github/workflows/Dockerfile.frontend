@@ -7,12 +7,12 @@ COPY da-opentelemetry-javaagent.jar /app/da-opentelemetry-javaagent.jar
 RUN chmod 555 /app/da-opentelemetry-javaagent.jar
 
 # Copy OpenTelemetry sampler configuration
-COPY service/src/main/resources/sampler-configuration.yaml /app/sampler-configuration.yaml
+COPY frontend/src/main/resources/sampler-configuration.yaml /app/sampler-configuration.yaml
 RUN chmod 555 /app/da-opentelemetry-javaagent.jar
 
 # Copy application
-COPY service.jar /app/service.jar
-RUN chmod +x /app/service.jar
+COPY frontend.jar /app/frontend.jar
+RUN chmod +x /app/frontend.jar
 WORKDIR /app/
 
 # Using Shell-form for normal shell processing. Any settings in JAVA_OPTS should
@@ -23,9 +23,9 @@ ENTRYPOINT java -jar \
   -Dotel.metrics.exporter="none" \
   -Dotel.logs.exporter="none" \
   -Dotel.traces.sampler="dynamic" \
-  -Dotel.service.name="da-otel-agent-service" \
+  -Dotel.service.name="da-otel-agent-frontend" \
   -Dotel.configuration.service.url="http://localhost:8080" \
   -Dotel.configuration.service.file=/app/sampler-configuration.yaml \
   -Dotel.javaagent.logging=application \
   $JAVA_OPTS \
-  /app/service.jar
+  /app/frontend.jar
