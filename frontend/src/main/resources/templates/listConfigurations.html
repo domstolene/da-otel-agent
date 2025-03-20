@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Configurations</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="/icons/font/bootstrap-icons.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>DA OTEL Agent Configurations</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Service Name</th>
+                <th>Sampler</th>
+                <th>Sample Ratio</th>
+                <th>Timestamp</th>
+                <th>Read Only</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="config : ${configs}">
+                <td th:text="${config.serviceName}"></td>
+                <td th:text="${config.sampler}"></td>
+                <td th:text="${config.sampleRatio}"></td>
+                <td th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td>
+                    <span th:if="${config.readOnly}">
+                        <i class="bi bi-lock-fill"></i>
+                    </span>
+                    <span th:unless="${config.readOnly}">
+                        <i class="bi bi-unlock-fill"></i>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
