@@ -129,13 +129,14 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64
+          dockerfile: Dockerfile.frontend
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   # Build and publish FRONTEND container image.
   build-and-push-frontend-image:
-    name: Build and push service image
+    name: Build and push frontend image
     needs: build-and-test-artifacts
     runs-on: ubuntu-latest
     permissions:
@@ -162,6 +163,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
           flavor: |
             latest=auto            
+
       - name: Download da-opentelemetry-javaagent.jar from previous job
         uses: actions/download-artifact@v4.1.7
         with:
@@ -186,6 +188,7 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64
+          dockerfile: Dockerfile.frontend
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
