@@ -12,6 +12,8 @@ configurations {
         resolutionStrategy.activateDependencyLocking()
     }
 }
+group = 'no.domstol.otel'
+version = '1.5.0'
 
 sourceCompatibility = 17
 targetCompatibility = 17
