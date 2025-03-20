@@ -31,10 +31,12 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 
-jar {
+bootJar {
     enabled = false
 }
-
+jar {
+    enabled = true
+}
 test {
     useJUnitPlatform()
 }
