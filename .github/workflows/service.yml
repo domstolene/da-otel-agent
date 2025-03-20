@@ -8,7 +8,8 @@ on:
 # workflow builds.
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
+  SERVICE_IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
+  FRONTEND_IMAGE_NAME:  domstolene/da-otel-agent-configuration-frontend
 
 jobs:
   build-and-test-artifacts:  
@@ -81,7 +82,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.SERVICE_IMAGE_NAME }}
 
       - name: Download da-opentelemetry-javaagent.jar from previous job
         uses: actions/download-artifact@v4.1.7
@@ -135,7 +136,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
 
       - name: Download da-opentelemetry-javaagent.jar from previous job
         uses: actions/download-artifact@v4.1.7

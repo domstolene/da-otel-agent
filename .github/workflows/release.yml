@@ -3,6 +3,7 @@ name: Build and publish release
 on:
   release:
     types: [published]
+
   workflow_dispatch:
 
 # Defines two custom environment variables for the workflow. These are used for 
@@ -10,7 +11,8 @@ on:
 # workflow builds.
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
+  SERVICE_IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
+  FRONTEND_IMAGE_NAME:  domstolene/da-otel-agent-configuration-frontend
 
 jobs:
   build-and-test-artifacts:  
@@ -98,7 +100,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.SERVICE_IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -157,7 +159,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
