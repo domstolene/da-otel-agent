@@ -17,7 +17,6 @@
  */
 package no.domstol.otel.agent.service;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,25 +48,31 @@ public class AgentConfigurationController {
     private ConcurrentMap<String, AgentConfiguration> configurations = new ConcurrentHashMap<>();
 
     private static String CLIENT_ID = "AgentConfigurationServiceClient/1.3";
-
+    
     @PostMapping("/agent-configuration")
-    public ResponseEntity<String> addAgentConfiguration(@RequestHeader("User-Agent") String userAgent,
-            @RequestBody AgentConfiguration configuration)
-            throws URISyntaxException {
-        Optional<AgentConfiguration> existingConfig = Optional
-                .ofNullable(getConfigurations().get(configuration.getServiceName()));
-        if (existingConfig.isPresent()) {
+    public ResponseEntity<?> addAgentConfigurations(@RequestHeader("User-Agent") String userAgent,
+            @RequestBody List<AgentConfiguration> configurations) throws URISyntaxException {
+        List<String> conflicts = new ArrayList<>();
+        for (AgentConfiguration configuration : configurations) {
+            if (getConfigurations().containsKey(configuration.getServiceName())) {
+                conflicts.add(configuration.getServiceName());
+            } else {
+                // If timestamp is not provided, set it to current time
+                if (configuration.getTimestamp() == 0) {
+                    configuration.setTimestamp(Instant.now().toEpochMilli());
+                }
+                getConfigurations().put(configuration.getServiceName(), configuration);
+            }
+        }
+        if (!conflicts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("A configuration with this name already exists, use PUT to modify");
+                    .body("A configuration with the following name(s) already exist: " + conflicts
+                            + ". Use PUT to modify them.");
         }
-        // make sure we have a correct timestamp
-        if (configuration.getTimestamp() == 0) {
-            configuration.setTimestamp(Instant.now().toEpochMilli());
-        }
-        getConfigurations().put(configuration.getServiceName(), configuration);
-        return ResponseEntity.created(new URI("/agent-configuration/" + configuration.getServiceName())).build();
+        // For simplicity, return an OK response indicating success.
+        return ResponseEntity.ok("Configurations added successfully");
     }
-
+    
     @GetMapping("/agent-configuration/{agentName}")
     public ResponseEntity<AgentConfiguration> getAgentConfiguration(@RequestHeader("User-Agent") String userAgent,
             @PathVariable String agentName) {
