@@ -142,4 +142,12 @@ public class AgentConfiguration {
         }
     }
 
+	public List<Rule> getRules() {
+		return rules;
+	}
+
+	public void setRules(List<Rule> rules) {
+		this.rules = rules;
+	}
+
 }
