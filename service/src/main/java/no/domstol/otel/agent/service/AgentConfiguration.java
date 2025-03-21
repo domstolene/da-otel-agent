@@ -149,5 +149,5 @@ public class AgentConfiguration {
 	public void setRules(List<Rule> rules) {
 		this.rules = rules;
 	}
-
+	
 }
