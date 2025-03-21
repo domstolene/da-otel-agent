@@ -70,7 +70,7 @@ The configuration service can be secured using a API key. This is enabled by spe
 
 There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both. 
 
-A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this version, unless the `readOnly` flag is set to true. The configuration file will automatically be reloaded if changed.
+A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this version, unless the `readOnly` flag is set to true, which is the default. The configuration file will automatically be reloaded if changed.
 
 ### Example agent configuration
 
@@ -79,6 +79,7 @@ A typical use case would be to set up a file based configuration while pointing 
   -Dotel.metrics.exporter=none \
   -Dotel.service.name=my-service \
   -Dotel.traces.sampler=dynamic \
+  -Dotel.configuration.readOnly=false \
   -Dotel.configuration.service.file=otel-configuration-file.yaml \
   -Dotel.configuration.service.url=http://otel-configuration-service.test \
   -Dotel.exporter.otlp.endpoint=http://otel-collector.test:4317 \
