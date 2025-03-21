@@ -17,6 +17,7 @@
  */
 package no.domstol.otel.agent.service;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Endpoint for OTEL Agent configurations.
+ * End point for OTEL Agent configurations.
  *
  * @since 1.0
  */
@@ -70,7 +71,9 @@ public class AgentConfigurationController {
                             + ". Use PUT to modify them.");
         }
         // For simplicity, return an OK response indicating success.
-        return ResponseEntity.ok("Configurations added successfully");
+        if (configurations.size()>1)
+        	return ResponseEntity.created(new URI("/agent-configuration/")).build();
+        else return ResponseEntity.created(new URI("/agent-configuration/" + configurations.get(0).getServiceName())).build();
     }
     
     @GetMapping("/agent-configuration/{agentName}")
