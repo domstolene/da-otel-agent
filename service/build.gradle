@@ -28,6 +28,7 @@ dependencies {
     implementation "io.micrometer:micrometer-core:1.11.1"
     implementation "io.micrometer:micrometer-registry-prometheus:1.11.1"
     implementation 'org.yaml:snakeyaml:2.2'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 
