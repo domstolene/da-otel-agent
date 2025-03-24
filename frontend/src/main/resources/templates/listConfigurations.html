@@ -37,8 +37,29 @@
 			<tbody>
 				<tr th:each="config : ${configs}">
 					<td th:text="${config.serviceName}"></td>
-					<td th:text="${config.sampler}"></td>
-					<td th:text="${config.sampleRatio}"></td>
+					<td>
+				      <select class="form-select" 
+				              th:id="'sampler-' + ${config.serviceName}"
+				              th:disabled="${config.readOnly}"
+				              th:name="sampler">
+					        <option th:each="samplerType : ${T(no.domstol.otel.agent.service.AgentConfiguration.SamplerType).values()}"
+					                th:value="${samplerType}"
+					                th:text="${samplerType}"
+					                th:selected="${config.sampler == samplerType}">
+					        </option>
+				        </select>
+					</td>
+					<td>
+						<input type="number"
+					         step="0.001"
+					         min="0"
+					         max="1"
+					         class="form-control"
+					         th:id="'ratio-' + ${config.serviceName}"
+					         th:name="sampleRatio"
+					         th:value="${config.sampleRatio}"
+					         th:disabled="${config.readOnly}" />
+					</td>
 					<td>
 						<span th:if="${config.rules != null and !#lists.isEmpty(config.rules)}">
 						  <i 
@@ -53,14 +74,22 @@
 						  </i>
 						</span>					
 					</td>
-					<td th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}"></td>
-					<td>
-						<span th:if="${config.readOnly}"> 
-							<i class="bi bi-lock-fill" style="color: #ff0000"></i>
-						</span> 
-						<span th:unless="${config.readOnly}"> 
-							<i class="bi bi-unlock-fill"></i>
-					</span></td>
+					<td
+						id="timestamp-' + ${config.serviceName}" 
+						th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}"></td>
+		    		<td>
+						<button type="button" class="btn btn-primary"
+							  title="Click to save configuration changes"
+				              th:attr="onclick='storeConfiguration(\'' + ${config.serviceName} + '\')'"
+				              th:disabled="${config.readOnly}">
+							<span th:unless="${config.readOnly}"> 
+					              <i class="bi bi-save-fill"></i>
+					        </span>
+							<span th:if="${config.readOnly}"> 
+					              <i class="bi bi-lock-fill"></i>
+					        </span>
+						</button>
+		    		</td>
 				</tr>
 			</tbody>
 		</table>
@@ -81,6 +110,44 @@
 	<script>
 		const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
 		const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+	</script>
+	<script>
+		function storeConfiguration(serviceName) {
+			const samplerSelect = document.getElementById('sampler-' + serviceName);
+		    const ratioInput = document.getElementById('ratio-' + serviceName);
+		    const payload = {
+		      serviceName: serviceName,
+		      sampler: samplerSelect.value,
+		      sampleRatio: parseFloat(ratioInput.value)
+		    };
+		
+		    fetch('http://localhost:8080/agent-configuration/' + serviceName, {
+		      method: 'PATCH',
+		      headers: {
+		        'Content-Type': 'application/json',
+		        // Replace with the recognized user agent if needed:
+		        'User-Agent': 'MyUserAgent'
+		      },
+		      body: JSON.stringify(payload)
+		    })
+		    .then(response => {
+		      if (response.ok) {
+		        return response.json();
+		      } else {
+		        return response.text().then(text => { throw new Error(text) });
+		      }
+		    })
+		    .then(updatedConfig => {
+		      // Update the timestamp cell with the new timestamp returned by the backend.
+		      const timestampCell = document.getElementById('timestamp-' + serviceName);
+		      const updatedDate = new Date(updatedConfig.timestamp);
+		      timestampCell.textContent = updatedDate.toLocaleString();
+		      alert("Configuration updated successfully!");
+		    })
+		    .catch(error => {
+		      alert("Error updating configuration: " + error);
+		    });
+    		}
 	</script>
 </body>
 </html>
