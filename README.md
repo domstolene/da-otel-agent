@@ -38,9 +38,10 @@ More than one attribute can be specified in each rule, and all must match for th
 
 ## The Agent Configuration Service
 
-The _OpenTelemetry Agent Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API supports all the common REST verbs except `PATCH`. The endpoints are as follows:
+The _OpenTelemetry Agent Configuration Service_ is a component of this project that keeps track of different agent configurations. This service exposes a RESTful API that allows clients to interact with it. The API supports all the common REST verbs. The endpoints are as follows:
 
-* `POST /agent-configuration` – Posts a _new_ agent configuration. The configuration must be in the payload.
+* `POST /agent-configuration` – Posts _new_ agent configuration(s). The configuration must be in the payload as a single object or an array if posting multiple configurations.
+* `PATCH /agent-configuration/<id>` – Updates the agent configuration with any changes. Only _changed_ values will be updated and the payload does not have to be complete.
 * `GET /agent-configuration/<id>` – Returns an agent configuration or 404 if not found.
 * `PUT /agent-configuration/<id>` – Updates an existing configuration, returns 404 if not found, or 403 if it is set to be _read only_. The configuration must be in the payload.
 * `DELETE /agent-configuration/<id>` – Deletes the agent configuration.
@@ -70,7 +71,7 @@ The configuration service can be secured using a API key. This is enabled by spe
 
 There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both. 
 
-A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this version, unless the `readOnly` flag is set to true. The configuration file will automatically be reloaded if changed.
+A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this version, unless the `readOnly` flag is set to true, which is the default. The configuration file will automatically be reloaded if changed.
 
 ### Example agent configuration
 
@@ -79,6 +80,7 @@ A typical use case would be to set up a file based configuration while pointing 
   -Dotel.metrics.exporter=none \
   -Dotel.service.name=my-service \
   -Dotel.traces.sampler=dynamic \
+  -Dotel.configuration.readOnly=false \
   -Dotel.configuration.service.file=otel-configuration-file.yaml \
   -Dotel.configuration.service.url=http://otel-configuration-service.test \
   -Dotel.exporter.otlp.endpoint=http://otel-collector.test:4317 \

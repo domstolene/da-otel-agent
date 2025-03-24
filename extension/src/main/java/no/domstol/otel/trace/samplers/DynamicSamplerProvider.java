@@ -147,6 +147,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
         String configurationServiceFile = config.getString("otel.configuration.service.file");
         String configurationServiceUrl = config.getString("otel.configuration.service.url");
         String serviceName = initialConfig.getString("otel.service.name");
+        String readOnly = config.getString("otel.configuration.readOnly");
 
         // there is no reason to not specify a name for the service, unless one
         // is not sampling anything
@@ -164,6 +165,11 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
         // set the service name, in case we don't have a configuration file and
         // the agent configuration is not found at the configuration service
         configuration.setServiceName(serviceName);
+        
+        // default is "true"
+        if (readOnly!=null && readOnly.equals("false")) {
+        	configuration.setReadOnly(false);
+        }
 
         // read the configuration from a file if specified
         if (configurationServiceFile != null) {

@@ -69,7 +69,7 @@ public class AgentConfigurationControllerTest {
         mockMvc.perform(post("/agent-configuration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("User-Agent", "MyUserAgent")
-                .content(asJsonString(agentConfiguration)))
+                .content(asJsonArray(agentConfiguration)))
                 .andExpect(status().isCreated());
 
         // Verify that the configuration has been added
@@ -80,7 +80,7 @@ public class AgentConfigurationControllerTest {
         mockMvc.perform(post("/agent-configuration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("User-Agent", "MyUserAgent")
-                .content(asJsonString(agentConfiguration)))
+                .content(asJsonArray(agentConfiguration)))
                 .andExpect(status().is(409));
     }
 
@@ -107,7 +107,7 @@ public class AgentConfigurationControllerTest {
         mockMvc.perform(post("/agent-configuration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("User-Agent", USER_AGENT_HEADER)
-                .content(asJsonString(agentConfiguration)))
+                .content(asJsonArray(agentConfiguration)))
                 .andExpect(status().isCreated());
 
         // This should fail because we use a unrecognized client
@@ -170,6 +170,14 @@ public class AgentConfigurationControllerTest {
     private static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    // A helper method to turn an object into a JSON array
+    private static String asJsonArray(final Object obj) {
+        try {
+            return "["+new ObjectMapper().writeValueAsString(obj)+ "]";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

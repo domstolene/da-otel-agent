@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<style>
+.popover-wider {
+    max-width: 500px;
+}	</style>
+<title>Agent Configurations</title>
+</head>
+<body>
+	<div class="container mt-4">
+		<h1>OTEL Agent Configurations</h1>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Service name</th>
+					<th>Sampler</th>
+					<th>Ratio</th>
+					<th></th>
+					<th>Last changed</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="config : ${configs}">
+					<td th:text="${config.serviceName}"></td>
+					<td>
+				      <select class="form-select" 
+				              th:id="'sampler-' + ${config.serviceName}"
+				              th:disabled="${config.readOnly}"
+				              th:name="sampler">
+					        <option th:each="samplerType : ${T(no.domstol.otel.agent.service.AgentConfiguration.SamplerType).values()}"
+					                th:value="${samplerType}"
+					                th:text="${samplerType}"
+					                th:selected="${config.sampler == samplerType}">
+					        </option>
+				        </select>
+					</td>
+					<td>
+						<input type="number"
+					         step="0.001"
+					         min="0"
+					         max="1"
+					         class="form-control"
+					         th:id="'ratio-' + ${config.serviceName}"
+					         th:name="sampleRatio"
+					         th:value="${config.sampleRatio}"
+					         th:disabled="${config.readOnly}" />
+					</td>
+					<td>
+						<span th:if="${config.rules != null and !#lists.isEmpty(config.rules)}">
+						  <i 
+						    class="bi bi-filter-circle-fill"
+						    data-bs-html="true"
+						    data-bs-trigger="hover"
+						    data-bs-toggle="popover"
+						  	data-bs-sanitize="false" 
+						  	data-bs-title="Filter rules"
+						  	data-bs-custom-class="popover-wider"
+						  	th:attr="data-bs-content=|${@configurationRenderer.getFormattedRules(config)}|">
+						  </i>
+						</span>					
+					</td>
+					<td
+						th:attr="id=|timestamp-${config.serviceName}|" 
+						th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}"></td>
+		    		<td>
+						<button type="button" class="btn btn-primary"
+							  title="Click to save configuration changes"
+				              th:attr="onclick='storeConfiguration(\'' + ${config.serviceName} + '\')'"
+				              th:disabled="${config.readOnly}">
+							<span th:unless="${config.readOnly}"> 
+					              <i class="bi bi-save-fill"></i>
+					        </span>
+							<span th:if="${config.readOnly}"> 
+					              <i class="bi bi-lock-fill"></i>
+					        </span>
+						</button>
+		    		</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+		integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+		integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+		crossorigin="anonymous"></script>
+	<script 
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+		crossorigin="anonymous"></script>
+	<!-- Include this script at the bottom of your page to initialize popovers -->
+	<script>
+		const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+		const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+	</script>
+	<script>
+		function storeConfiguration(serviceName) {
+			const samplerSelect = document.getElementById('sampler-' + serviceName);
+		    const ratioInput = document.getElementById('ratio-' + serviceName);
+		    const payload = {
+		      serviceName: serviceName,
+		      sampler: samplerSelect.value,
+		      sampleRatio: parseFloat(ratioInput.value)
+		    };
+		
+		    fetch('http://localhost:8080/agent-configuration/' + serviceName, {
+		      method: 'PATCH',
+		      headers: {
+		        'Content-Type': 'application/json',
+		        // Replace with the recognized user agent if needed:
+		        'User-Agent': 'MyUserAgent'
+		      },
+		      body: JSON.stringify(payload)
+		    })
+		    .then(response => {
+		      if (response.ok) {
+		        return response.json();
+		      } else {
+		        return response.text().then(text => { throw new Error(text) });
+		      }
+		    })
+		    .then(updatedConfig => {
+		      // Update the timestamp cell with the new timestamp returned by the backend.
+		      const timestampCell = document.getElementById('timestamp-' + serviceName);
+		      const updatedDate = new Date(updatedConfig.timestamp);
+		      timestampCell.textContent = updatedDate.toLocaleString();
+		      alert("Configuration updated successfully!");
+		    })
+		    .catch(error => {
+		      alert("Error updating configuration: " + error);
+		    });
+    		}
+	</script>
+</body>
+</html>
