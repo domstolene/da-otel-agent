@@ -75,7 +75,7 @@
 						</span>					
 					</td>
 					<td
-						id="timestamp-' + ${config.serviceName}" 
+						th:attr="id=|timestamp-${config.serviceName}|" 
 						th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}"></td>
 		    		<td>
 						<button type="button" class="btn btn-primary"
