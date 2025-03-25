@@ -13,6 +13,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.buildship.core.classpathprovider"/>
+    <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21/"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="no.domstol.otel.agent.service.AgentConfigurationServiceApplication"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="service"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.security.egd=file:/dev/./urandom \&#10;-javaagent:${project_loc:/da-otel-agent/README.md}/extension/build/libs/da-opentelemetry-javaagent.jar \&#10;-Dotel.metrics.exporter=&quot;none&quot; \&#10;-Dotel.traces.sampler=&quot;dynamic&quot; \&#10;-Dotel.service.name=&quot;da-otel-agent-service&quot; \&#10;-Dotel.configuration.service.url=&quot;http://localhost:8080&quot;"/>

@@ -111,8 +111,11 @@
 		const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
 		const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 	</script>
-	<script>
-		function storeConfiguration(serviceName) {
+	<script th:inline="javascript">
+		  /*<![CDATA[*/
+		  var agentConfigurationUrl = /*[[${servicePublicURL}]]*/ "http://localhost:8080/agent-configuration";
+		  console.log("Agent Configuration URL: " + agentConfigurationUrl);
+  		function storeConfiguration(serviceName) {
 			const samplerSelect = document.getElementById('sampler-' + serviceName);
 		    const ratioInput = document.getElementById('ratio-' + serviceName);
 		    const payload = {
@@ -120,13 +123,12 @@
 		      sampler: samplerSelect.value,
 		      sampleRatio: parseFloat(ratioInput.value)
 		    };
-		
-		    fetch('http://localhost:8080/agent-configuration/' + serviceName, {
+		    fetch(agentConfigurationUrl + '/' + serviceName, {
 		      method: 'PATCH',
 		      headers: {
 		        'Content-Type': 'application/json',
 		        // Replace with the recognized user agent if needed:
-		        'User-Agent': 'MyUserAgent'
+		        'User-Agent': 'da-otel-agent-frontend'
 		      },
 		      body: JSON.stringify(payload)
 		    })
@@ -148,6 +150,7 @@
 		      alert("Error updating configuration: " + error);
 		    });
     		}
+	/*]]>*/
 	</script>
 </body>
 </html>

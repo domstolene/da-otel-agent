@@ -17,8 +17,12 @@ public class AgentConfigurationController {
 
     @GetMapping("/")
     public String listConfigurations(Model model) {
-        String url = "http://localhost:8080/agent-configuration";
-        AgentConfiguration[] configs = restTemplate.getForObject(url, AgentConfiguration[].class);
+    	// default value is for local development
+    	String internalURL = System.getProperty("otel.configuration.service.url", "http://localhost:8080");
+    	String publicURL = System.getProperty("otel.configuration.public.url", "http://localhost:8080");
+        AgentConfiguration[] configs = restTemplate.getForObject(internalURL+"/agent-configuration", AgentConfiguration[].class);
+        model.addAttribute("serviceInternalURL", internalURL+"/agent-configuration");
+        model.addAttribute("servicePublicURL", publicURL+"/agent-configuration");
         model.addAttribute("configs", Arrays.asList(configs));
         return "listConfigurations";
     }
