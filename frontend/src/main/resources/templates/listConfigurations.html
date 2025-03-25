@@ -3,7 +3,7 @@
 	layout:decorate="~{base}">
 
 <head>
-	<title>Agent Configurations</title>
+	<title>OTEL Agent Configurations</title>
 </head>
 
 <body>
@@ -22,8 +22,11 @@
 					</tr>
 				</thead>
 				<tbody>
+
 					<tr th:each="config : ${configs}">
-						<td th:text="${config.serviceName}"></td>
+						<td><a th:text="${config.serviceName}"
+								th:href="@{/{configName}(configName=${config.serviceName})}"></a>
+						</td>
 						<td>
 							<select class="form-select" th:id="'sampler-' + ${config.serviceName}"
 								th:disabled="${config.readOnly}" th:name="sampler">
@@ -44,7 +47,7 @@
 								<i class="bi bi-filter-circle-fill" data-bs-html="true" data-bs-trigger="hover"
 									data-bs-toggle="popover" data-bs-sanitize="false" data-bs-title="Filter rules"
 									data-bs-custom-class="popover-wider"
-									th:attr="data-bs-content=|${@configurationRenderer.getFormattedRules(config)}|">
+									th:attr="data-bs-content='<pre>' + ${@configurationRenderer.getFormattedRules(config)} + '</pre>'">
 								</i>
 							</span>
 						</td>
@@ -64,10 +67,10 @@
 							</button>
 						</td>
 					</tr>
+					</a>
 				</tbody>
 			</table>
 		</div>
-		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 		<script th:inline="javascript">
 			/*<![CDATA[*/
 			var agentConfigurationUrl = /*[[${servicePublicURL}]]*/ "http://localhost:8080/agent-configuration";
@@ -108,11 +111,6 @@
 					});
 			}
 			/*]]>*/
-		</script>
-		<!-- Include this script at the bottom of your page to initialize popovers -->
-		<script>
-			const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
-			const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 		</script>
 </body>
 
