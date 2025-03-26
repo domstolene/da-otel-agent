@@ -69,12 +69,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            const toastElList = document.querySelectorAll('.toast')
-            const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl, {}));
+
             const form = document.querySelector('form');
-            const successToast = document.getElementById('successToast');
-            const errorToast = document.getElementById('errorToast');
-            const errorMsg = document.getElementById('errorMsg');
+
 
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
@@ -82,6 +79,7 @@
 
                 try {
                     await updateConfig();
+                    successToastConfigName.textContent = serviceName;
                     activeToast = bootstrap.Toast.getOrCreateInstance(successToast);
                 } catch (error) {
                     console.error("Error updating configuration:", error);

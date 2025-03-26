@@ -32,7 +32,7 @@
                     aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                <p th:text="${name} + ' configuration updated!'"></p>
+                <p><span id="successToastConfigName"></span> configuration updated!</p>
             </div>
         </div>
         <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -63,6 +63,12 @@
     <script>
         const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
         const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+        const toastElList = document.querySelectorAll('.toast')
+        const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl, {}));
+        const successToast = document.getElementById('successToast');
+        const toastConfigName = document.getElementById('successToastConfigName')
+        const errorToast = document.getElementById('errorToast');
+        const errorMsg = document.getElementById('errorMsg');
     </script>
 </body>
 

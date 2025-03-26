@@ -59,7 +59,7 @@
 								th:attr="onclick='storeConfiguration(\'' + ${config.serviceName} + '\')'"
 								th:disabled="${config.readOnly}">
 								<span th:unless="${config.readOnly}">
-									<i class="bi bi-save-fill"></i>
+									<i class="bi bi-floppy-fill"></i> Save
 								</span>
 								<span th:if="${config.readOnly}">
 									<i class="bi bi-lock-fill"></i>
@@ -104,10 +104,12 @@
 						const timestampCell = document.getElementById('timestamp-' + serviceName);
 						const updatedDate = new Date(updatedConfig.timestamp);
 						timestampCell.textContent = updatedDate.toLocaleString();
-						alert("Configuration updated successfully!");
+						successToastConfigName.textContent = serviceName;
+						bootstrap.Toast.getOrCreateInstance(successToast).show();
 					})
 					.catch(error => {
-						alert("Error updating configuration: " + error);
+						bootstrap.Toast.getOrCreateInstance(errorToast).show();
+						errorMsg.textContent = error;
 					});
 			}
 			/*]]>*/
