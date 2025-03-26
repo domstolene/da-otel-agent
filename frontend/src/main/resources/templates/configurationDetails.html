@@ -18,11 +18,45 @@
             margin-bottom: 1rem;
         }
     </style>
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const agentConfigurationUrl = /*[[${servicePublicURL}]]*/ "http://localhost:8080/agent-configuration";
+        const serviceName = /*[[${name}]]*/ "placeholder-name"
+        /*]]>*/
+
+        console.log("Agent Configuration URL: " + agentConfigurationUrl);
 
         function updateConfig() {
-            
-            throw Error;
+            const samplerSelect = document.getElementById('sampler');
+            const ratioInput = document.getElementById('ratio');
+
+            const payload = {
+                serviceName: serviceName,
+                sampler: samplerSelect.value,
+                sampleRatio: parseFloat(ratioInput.value)
+            };
+
+            return fetch(agentConfigurationUrl + '/' + serviceName, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'da-otel-agent-frontend'
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(updatedConfig => {
+                    const timestampCell = document.getElementById('timestamp');
+                    const updatedDate = new Date(updatedConfig.timestamp);
+                    timestampCell.textContent = updatedDate.toLocaleString();
+                });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -32,25 +66,22 @@
             const form = document.querySelector('form');
             const successToast = document.getElementById('successToast');
             const errorToast = document.getElementById('errorToast');
+            const errorMsg = document.getElementById('errorMsg');
 
-            form.addEventListener('submit', (event) => {
+            form.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 let activeToast = null;
 
-
                 try {
-                    updateConfig();
+                    await updateConfig();
                     activeToast = bootstrap.Toast.getOrCreateInstance(successToast);
-                }
-                catch {
-                    console.log("Failed")
+                } catch (error) {
+                    console.error("Error updating configuration:", error);
+                    errorMsg.textContent = error;
                     activeToast = bootstrap.Toast.getOrCreateInstance(errorToast);
                 }
 
                 activeToast.show();
-
-
-
             });
         });
     </script>
@@ -62,7 +93,7 @@
             <h1 th:text="${name}"></h1>
             <hr>
             <p><b>Read Only:</b> <span th:text="${config.readOnly}">false</span></p>
-            <p><b>Last changed:</b> <span
+            <p><b>Last changed:</b> <span id="timestamp"
                     th:text="${#dates.format(config.timestamp, 'yyyy-MM-dd HH:mm:ss')}">Timestamp</span></p>
             <div>
                 <form>
@@ -117,6 +148,7 @@
                 </div>
                 <div class="toast-body">
                     <p th:text="${name} + ' configuration could not be updated!'"></p>
+                    <p id="errorMsg"></p>
                 </div>
             </div>
         </div>
