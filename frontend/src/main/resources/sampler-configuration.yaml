@@ -6,6 +6,5 @@ rules:
   - exclude:
     - http.target: "/metrics"
       http.method: "GET"
-  - exclude:
     - http.target: "/metrics/.+"
       http.method: "POST"
