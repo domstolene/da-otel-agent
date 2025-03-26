@@ -24,16 +24,24 @@
         const serviceName = /*[[${name}]]*/ "placeholder-name"
         /*]]>*/
 
-        console.log("Agent Configuration URL: " + agentConfigurationUrl);
+        function yamlToJson(yamlString) {
+            try {
+                return jsyaml.load(yamlString);
+            } catch (e) {
+                throw Error("Invalid YAML, unable to convert to JSON.");
+            }
+        }
 
         function updateConfig() {
             const samplerSelect = document.getElementById('sampler');
             const ratioInput = document.getElementById('ratio');
+            const rulesTextarea = document.getElementById('rules-textarea')
 
             const payload = {
                 serviceName: serviceName,
                 sampler: samplerSelect.value,
-                sampleRatio: parseFloat(ratioInput.value)
+                sampleRatio: parseFloat(ratioInput.value),
+                rules: [yamlToJson(rulesTextarea.value)]
             };
 
             return fetch(agentConfigurationUrl + '/' + serviceName, {
@@ -90,6 +98,9 @@
 <body>
     <div layout:fragment="content">
         <div class="container mt-4">
+            <a href="/" class="btn">
+                <i class="bi bi-arrow-left"></i> Back to overview
+            </a>
             <h1 th:text="${name}"></h1>
             <hr>
             <p><b>Read Only:</b> <span th:text="${config.readOnly}">false</span></p>
