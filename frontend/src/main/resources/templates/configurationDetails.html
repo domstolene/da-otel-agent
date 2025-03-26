@@ -8,7 +8,52 @@
         label {
             font-weight: bold;
         }
+
+        .form-control {
+            display: inline;
+            width: 300px;
+        }
+
+        form div {
+            margin-bottom: 1rem;
+        }
     </style>
+    <script>
+
+        function updateConfig() {
+            
+            throw Error;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const toastElList = document.querySelectorAll('.toast')
+            const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl, {}));
+            const form = document.querySelector('form');
+            const successToast = document.getElementById('successToast');
+            const errorToast = document.getElementById('errorToast');
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                let activeToast = null;
+
+
+                try {
+                    updateConfig();
+                    activeToast = bootstrap.Toast.getOrCreateInstance(successToast);
+                }
+                catch {
+                    console.log("Failed")
+                    activeToast = bootstrap.Toast.getOrCreateInstance(errorToast);
+                }
+
+                activeToast.show();
+
+
+
+            });
+        });
+    </script>
 </head>
 
 <body>
@@ -20,12 +65,12 @@
             <p><b>Last changed:</b> <span
                     th:text="${#dates.format(config.timestamp, 'yyyy-MM-dd HH:mm:ss')}">Timestamp</span></p>
             <div>
-                <form action="TODO">
+                <form>
 
                     <div>
-                        <label th:for="'sampler-' + ${config.serviceName}">Sampler: </label>
-                        <select class="form-select" th:id="'sampler-' + ${config.serviceName}"
-                            th:disabled="${config.readOnly}" th:name="sampler">
+                        <label for="sampler">Sampler: </label>
+                        <select class="form-select form-control" id="sampler" th:disabled="${config.readOnly}"
+                            th:name="sampler">
                             <option
                                 th:each="samplerType : ${T(no.domstol.otel.agent.service.AgentConfiguration.SamplerType).values()}"
                                 th:value="${samplerType}" th:text="${samplerType}"
@@ -35,10 +80,9 @@
                     </div>
 
                     <div>
-                        <label th:for="'ratio-' + ${config.serviceName}">Sample ratio:</label>
-                        <input type="number" step="0.001" min="0" max="1" th:id="'ratio-' + ${config.serviceName}"
-                            class="form-control" th:name="sampleRatio" th:value="${config.sampleRatio}"
-                            th:disabled="${config.readOnly}" />
+                        <label for="ratio">Sample ratio:</label>
+                        <input type="number" step="0.001" min="0" max="1" id="ratio" class="form-control"
+                            th:name="sampleRatio" th:value="${config.sampleRatio}" th:disabled="${config.readOnly}" />
                     </div>
 
                     <div>
@@ -48,9 +92,32 @@
                         <p th:if="${config.rules == null}">No rules defined.</p>
                     </div>
 
-                    <button type="submit" th:disabled="${config.readOnly}" class="btn btn-primary float-right">Update
+                    <button type="submit" id="saveBtn" th:disabled="${config.readOnly}" class="btn btn-primary"><i
+                            class="bi bi-floppy-fill"></i> Save
                         agent configuration</button>
                 </form>
+            </div>
+        </div>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header text-bg-success">
+                    <strong class="me-auto">Saved!</strong>
+                    <button type="button" class="btn-close btn-close-white border-0" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <p th:text="${name} + ' configuration updated!'"></p>
+                </div>
+            </div>
+            <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header text-bg-danger">
+                    <strong class="me-auto">Error!</strong>
+                    <button type="button" class="btn-close btn-close-white border-0" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <p th:text="${name} + ' configuration could not be updated!'"></p>
+                </div>
             </div>
         </div>
     </div>

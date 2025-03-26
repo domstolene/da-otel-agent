@@ -34,11 +34,11 @@ public class AgentConfigurationController {
     public String configurationDetails(@PathVariable("configName") String configName, Model model) {
         // default value is for local development
         String internalURL = System.getProperty("otel.configuration.service.url", "http://localhost:8080");
-        // String publicURL = System.getProperty("otel.configuration.public.url",
-        // "http://localhost:8080");
+        String publicURL = System.getProperty("otel.configuration.public.url", "http://localhost:8080");
         AgentConfiguration config = restTemplate.getForObject(internalURL + "/agent-configuration/" + configName,
                 AgentConfiguration.class);
         model.addAttribute("name", configName);
+        model.addAttribute("servicePublicURL", publicURL + "/agent-configuration");
         model.addAttribute("config", config);
         return "configurationDetails";
     }
