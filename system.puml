@@ -2,6 +2,7 @@
 skin rose
 
 actor user as "User"
+component frontend as "Agent configuration frontend"
 component service as "Agent configuration service"
 component prometheus as "Prometheus"
 component collector as "OTEL collector"
@@ -11,8 +12,10 @@ node agent as  "OTEL Agent" {
  dynamic --> delegate: Delegates
 }
 
+frontend <--> service
 dynamic <--> service : Configuration\n and metrics
 service --> prometheus : Metrics
 agent --> collector
 user --> service : Read and modify configuration
+user --> frontend : Read and modify configuration
 @enduml
