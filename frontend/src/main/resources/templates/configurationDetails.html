@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{base}">
+
+<head>
+    <title>Agent Configuration</title>
+    <style>
+        label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            display: inline;
+            width: 300px;
+        }
+
+        form div {
+            margin-bottom: 1rem;
+        }
+
+        #rules-textarea::placeholder {
+            opacity: 0.5;
+        }
+    </style>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const agentConfigurationUrl = /*[[${servicePublicURL}]]*/ "http://localhost:8080/agent-configuration";
+        const serviceName = /*[[${name}]]*/ "placeholder-name"
+        /*]]>*/
+
+        function yamlToJson(yamlString) {
+            try {
+                return jsyaml.load(yamlString);
+            } catch (e) {
+                throw Error("Invalid YAML, unable to convert to JSON.");
+            }
+        }
+
+        function updateConfig() {
+            const samplerSelect = document.getElementById('sampler');
+            const ratioInput = document.getElementById('ratio');
+            const rulesTextarea = document.getElementById('rules-textarea')
+            const rulesList = []
+            const rules = yamlToJson(rulesTextarea.value);
+            if (rules != null) {
+                rulesList.push(rules)
+            }
+
+
+            const payload = {
+                serviceName: serviceName,
+                sampler: samplerSelect.value,
+                sampleRatio: parseFloat(ratioInput.value),
+                rules: rulesList
+            };
+
+            return fetch(agentConfigurationUrl + '/' + serviceName, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'da-otel-agent-frontend'
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(updatedConfig => {
+                    const timestampCell = document.getElementById('timestamp');
+                    const updatedDate = new Date(updatedConfig.timestamp);
+                    timestampCell.textContent = updatedDate.toLocaleString();
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+
+            const form = document.querySelector('form');
+
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                let activeToast = null;
+
+                try {
+                    await updateConfig();
+                    successToastConfigName.textContent = serviceName;
+                    activeToast = bootstrap.Toast.getOrCreateInstance(successToast);
+                } catch (error) {
+                    console.error("Error updating configuration:", error);
+                    errorMsg.textContent = error;
+                    activeToast = bootstrap.Toast.getOrCreateInstance(errorToast);
+                }
+
+                activeToast.show();
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container mt-4">
+            <a href="/" class="btn">
+                <i class="bi bi-arrow-left"></i> Back to overview
+            </a>
+            <h1 th:text="${name}"></h1>
+            <hr>
+            <p><b>Read Only:</b> <span th:text="${config.readOnly}">false</span></p>
+            <p><b>Last changed:</b> <span id="timestamp"
+                    th:text="${#dates.format(config.timestamp, 'yyyy-MM-dd HH:mm:ss')}">Timestamp</span></p>
+            <div>
+                <form>
+                    <div>
+                        <label for="sampler">Sampler: </label>
+                        <select class="form-select form-control" id="sampler" th:disabled="${config.readOnly}"
+                            th:name="sampler">
+                            <option
+                                th:each="samplerType : ${T(no.domstol.otel.agent.service.AgentConfiguration.SamplerType).values()}"
+                                th:value="${samplerType}" th:text="${samplerType}"
+                                th:selected="${config.sampler == samplerType}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="ratio">Sample ratio:</label>
+                        <input type="number" step="0.001" min="0" max="1" id="ratio" class="form-control"
+                            th:name="sampleRatio" th:value="${config.sampleRatio}" th:disabled="${config.readOnly}" />
+                    </div>
+
+                    <div>
+                        <label style="display: block;" for="rules-textarea" class="form-label">Rules:</label>
+                        <textarea id="rules-textarea" class="form-control" rows="10"
+                            th:text="${@configurationRenderer.getFormattedRules(config)}" placeholder="#EXAMPLE RULES
+rules:
+  - exclude:
+    - http.target: &quot;/health/.+&quot;
+      http.method: &quot;GET&quot;
+    - http.target: &quot;/metrics&quot;
+      http.method: &quot;GET&quot;
+  - include:
+    - http.method: &quot;POST&quot;
+"></textarea>
+                        <p th:if="${config.rules == null}">No rules defined.</p>
+                    </div>
+
+                    <button type="submit" id="saveBtn" th:disabled="${config.readOnly}" class="btn btn-primary"><i
+                            class="bi bi-floppy-fill"></i> Save
+                        agent configuration</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
