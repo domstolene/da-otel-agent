@@ -1,7 +1,9 @@
 package no.domstol.otel.agent.frontend;
 
+import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.util.digester.Rules;
 import org.springframework.stereotype.Component;
 
 import no.domstol.otel.agent.service.AgentConfiguration;
@@ -17,8 +19,15 @@ public class AgentConfigurationRenderer {
 	 */
 	public String getFormattedRules(AgentConfiguration config) {
 
+		List<Rule> rules = config.getRules();
+
+		if (rules == null || rules.isEmpty()) {
+			return "";
+		}
+
 		StringBuilder sb = new StringBuilder();
-		for (Rule rule : config.getRules()) {
+		for (Rule rule : rules) {
+
 			if (rule.getExclude() != null && !rule.getExclude().isEmpty()) {
 				sb.append("exclude:\n");
 				for (Map<String, String> set : rule.getExclude()) {

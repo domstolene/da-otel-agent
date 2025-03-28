@@ -36,12 +36,18 @@
             const samplerSelect = document.getElementById('sampler');
             const ratioInput = document.getElementById('ratio');
             const rulesTextarea = document.getElementById('rules-textarea')
+            const rulesList = []
+            const rules = yamlToJson(rulesTextarea.value);
+            if (rules != null) {
+                rulesList.push(rules)
+            }
+
 
             const payload = {
                 serviceName: serviceName,
                 sampler: samplerSelect.value,
                 sampleRatio: parseFloat(ratioInput.value),
-                rules: [yamlToJson(rulesTextarea.value)]
+                rules: rulesList
             };
 
             return fetch(agentConfigurationUrl + '/' + serviceName, {
@@ -127,7 +133,16 @@
                     <div>
                         <label style="display: block;" for="rules-textarea" class="form-label">Rules:</label>
                         <textarea id="rules-textarea" class="form-control" rows="10"
-                            th:text="${@configurationRenderer.getFormattedRules(config)}"></textarea>
+                            th:text="${@configurationRenderer.getFormattedRules(config)}" placeholder="#EXAMPLE RULES
+rules:
+  - exclude:
+    - http.target: &quot;/health/.+&quot;
+      http.method: &quot;GET&quot;
+    - http.target: &quot;/metrics&quot;
+      http.method: &quot;GET&quot;
+  - include:
+    - http.method: &quot;POST&quot;
+"></textarea>
                         <p th:if="${config.rules == null}">No rules defined.</p>
                     </div>
 
