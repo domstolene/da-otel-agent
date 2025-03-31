@@ -166,18 +166,21 @@ public class AgentConfigurationServiceClient {
 
     private void postMetrics(String serviceName, String configurationServiceUrl, String apiKey, SamplerMetrics metrics)
             throws UnsupportedCharsetException, ClientProtocolException, IOException {
-        HttpPost postRequest = new HttpPost(configurationServiceUrl + "/metrics/" + serviceName);
-        if (apiKey != null)
-            postRequest.addHeader(API_KEY_HEADER, apiKey);
-        postRequest.setHeader("User-Agent", USER_AGENT_HEADER);
-        postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(metrics.copyAndClear()),
-                ContentType.APPLICATION_JSON.withCharset("UTF-8")));
-        try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
-            int statusCode = execute.getStatusLine().getStatusCode();
-            if (statusCode > 300) {
-                logger.severe("Metrics post failed with status code: " + statusCode);
-            }
-        }
-    }
+    	if (metrics != null) {
+	        HttpPost postRequest = new HttpPost(configurationServiceUrl + "/metrics/" + serviceName);
+	        if (apiKey != null)
+	            postRequest.addHeader(API_KEY_HEADER, apiKey);
+	        postRequest.setHeader("User-Agent", USER_AGENT_HEADER);
+	        // XXX: Cannot invoke "no.domstol.otel.trace.samplers.SamplerMetrics.copyAndClear()" because "metrics" is null
+	        postRequest.setEntity(new StringEntity(objectMapper.writeValueAsString(metrics.copyAndClear()),
+	                ContentType.APPLICATION_JSON.withCharset("UTF-8")));
+	        try (CloseableHttpResponse execute = httpClient.execute(postRequest)) {
+	            int statusCode = execute.getStatusLine().getStatusCode();
+	            if (statusCode > 300) {
+	                logger.severe("Metrics post failed with status code: " + statusCode);
+	            }
+	        }
+    	}
+	}
 
 }
