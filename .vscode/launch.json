@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AgentConfigurationServiceFrontend<frontend>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "no.domstol.otel.agent.frontend.AgentConfigurationServiceFrontend",
+            "vmArgs": "-Djava.security.egd=file:/dev/./urandom -Dotel.metrics.exporter=\"none\" -Dotel.traces.sampler=\"dynamic\" -Dotel.service.name=\"da-otel-agent-frontend\" -Dotel.configuration.readOnly=\"false\" -Dotel.configuration.service.url=\"http://localhost:8080\"",
+            "projectName": "frontend",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-AgentConfigurationServiceApplication<service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "no.domstol.otel.agent.service.AgentConfigurationServiceApplication",
+            "vmArgs": "-Djava.security.egd=file:/dev/./urandom -Dotel.metrics.exporter=\"none\"  -Dotel.traces.sampler=\"dynamic\"  -Dotel.service.name=\"da-otel-agent-service\"  -Dotel.configuration.service.url=\"http://localhost:8080\"",
+            "projectName": "service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
