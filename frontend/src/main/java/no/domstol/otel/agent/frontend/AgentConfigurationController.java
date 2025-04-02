@@ -22,10 +22,12 @@ public class AgentConfigurationController {
         // default value is for local development
         String internalURL = System.getProperty("otel.configuration.service.url", "http://localhost:8080");
         String publicURL = System.getProperty("otel.configuration.public.url", "http://localhost:8080");
+        String jaegerURL = System.getProperty("otel.configuration.jaeger.url", "http://localhost:16686");
         AgentConfiguration[] configs = restTemplate.getForObject(internalURL + "/agent-configuration",
                 AgentConfiguration[].class);
         model.addAttribute("serviceInternalURL", internalURL + "/agent-configuration");
         model.addAttribute("servicePublicURL", publicURL + "/agent-configuration");
+        model.addAttribute("jaegerURL",jaegerURL);
         model.addAttribute("configs", Arrays.asList(configs));
         return "listConfigurations";
     }
