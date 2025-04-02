@@ -43,13 +43,24 @@
 								th:value="${config.sampleRatio}" th:disabled="${config.readOnly}" />
 						</td>
 						<td>
+							<a th:href="@{/{configName}(configName=${config.serviceName})}">
+							<!-- Filled icon when rules are present -->
 							<span th:if="${config.rules != null and !#lists.isEmpty(config.rules)}">
-								<i class="bi bi-filter-circle-fill" data-bs-html="true" data-bs-trigger="hover"
+								<i class="bi bi-filter-square-fill btn" data-bs-html="true" data-bs-trigger="hover"
 									data-bs-toggle="popover" data-bs-sanitize="false" data-bs-title="Filter rules"
 									data-bs-custom-class="popover-wider"
 									th:attr="data-bs-content='<pre>' + ${@configurationRenderer.getFormattedRules(config)} + '</pre>'">
 								</i>
 							</span>
+							<!-- Empty icon when rules are not present -->
+							<span th:unless="${config.rules != null and !#lists.isEmpty(config.rules)}">
+								<i class="bi bi-filter-square btn" data-bs-html="true" data-bs-trigger="hover"
+									data-bs-toggle="popover" data-bs-sanitize="false" data-bs-title="Filter rules"
+									data-bs-custom-class="popover-wider"
+									th:attr="data-bs-content='No rules has been specified.'">
+								</i>
+							</span>
+							</a>
 						</td>
 						<td th:attr="id=|timestamp-${config.serviceName}|"
 							th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}">
