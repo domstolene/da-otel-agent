@@ -136,7 +136,7 @@
 
                     <div>
                         <label style="display: block;" for="rules-textarea" class="form-label">Rules:</label>
-                        <textarea id="rules-textarea" class="form-control" rows="10"
+                        <textarea id="rules-textarea" class="form-control font-monospace w-50" rows="10" cols="50"
                             th:text="${@configurationRenderer.getFormattedRules(config)}" placeholder="#EXAMPLE RULES
 rules:
   - exclude:

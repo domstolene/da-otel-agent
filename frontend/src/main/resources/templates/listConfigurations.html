@@ -14,6 +14,7 @@
 				<thead>
 					<tr>
 						<th>Service name</th>
+						<th></th>
 						<th>Sampler</th>
 						<th>Ratio</th>
 						<th></th>
@@ -26,6 +27,9 @@
 					<tr th:each="config : ${configs}">
 						<td><a th:text="${config.serviceName}"
 								th:href="@{/{configName}(configName=${config.serviceName})}"></a>
+						</td>
+						<td>
+							<a th:href="${jaegerURL + '/search?service=' + config.serviceName}"><i class="bi bi-search btn btn-outline-secondary" title="Click to view traces in Jaeger"></i></a>
 						</td>
 						<td>
 							<select class="form-select" th:id="'sampler-' + ${config.serviceName}"
@@ -43,26 +47,39 @@
 								th:value="${config.sampleRatio}" th:disabled="${config.readOnly}" />
 						</td>
 						<td>
-							<span th:if="${config.rules != null and !#lists.isEmpty(config.rules)}">
-								<i class="bi bi-filter-circle-fill" data-bs-html="true" data-bs-trigger="hover"
-									data-bs-toggle="popover" data-bs-sanitize="false" data-bs-title="Filter rules"
-									data-bs-custom-class="popover-wider"
-									th:attr="data-bs-content='<pre>' + ${@configurationRenderer.getFormattedRules(config)} + '</pre>'">
-								</i>
-							</span>
+							<a th:href="${config.readOnly} ? '#' : @{/{configName}(configName=${config.serviceName})}"
+							   th:class="(${config.readOnly} ? ' disabled' : '')"
+							   th:attr="tabindex=${config.readOnly} ? -1 : null, aria-disabled=${config.readOnly}">
+								<!-- Filled icon when rules are present -->
+								<span th:if="${config.rules != null and !#lists.isEmpty(config.rules)}">
+									<i class="bi bi-filter-square-fill btn btn-outline-secondary" data-bs-html="true" data-bs-trigger="hover"
+										data-bs-toggle="popover" data-bs-sanitize="false" data-bs-title="Filter rules"
+										data-bs-custom-class="popover-wider"
+										th:attr="data-bs-content='<pre>' + ${@configurationRenderer.getFormattedRules(config)} + '</pre>'">
+									</i>
+								</span>
+								<!-- Empty icon when rules are not present -->
+								<span th:unless="${config.rules != null and !#lists.isEmpty(config.rules)}">
+									<i class="bi bi-filter-square btn btn-outline-secondary" data-bs-html="true" data-bs-trigger="hover"
+										data-bs-toggle="popover" data-bs-sanitize="false" data-bs-title="Filter rules"
+										data-bs-custom-class="popover-wider"
+										th:attr="data-bs-content='No rules has been specified.'">
+									</i>
+								</span>
+							</a>
 						</td>
 						<td th:attr="id=|timestamp-${config.serviceName}|"
 							th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}">
 						</td>
 						<td>
-							<button type="button" class="btn btn-primary" title="Click to save configuration changes"
+							<button type="button" class="btn btn-outline-primary" title="Click to save configuration changes"
 								th:attr="onclick='storeConfiguration(\'' + ${config.serviceName} + '\')'"
 								th:disabled="${config.readOnly}">
 								<span th:unless="${config.readOnly}">
 									<i class="bi bi-floppy-fill"></i> Save
 								</span>
 								<span th:if="${config.readOnly}">
-									<i class="bi bi-lock-fill"></i>
+									<i class="bi bi-lock-fill"></i> Locked
 								</span>
 							</button>
 						</td>
