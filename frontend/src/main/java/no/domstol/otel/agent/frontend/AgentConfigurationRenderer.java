@@ -3,7 +3,6 @@ package no.domstol.otel.agent.frontend;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tomcat.util.digester.Rules;
 import org.springframework.stereotype.Component;
 
 import no.domstol.otel.agent.service.AgentConfiguration;
