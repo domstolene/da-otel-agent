@@ -33,6 +33,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: da-opentelemetry-javaagent.jar
-        path: extension/build/libs/da-opentelemetry-javaagent.jar
-        if-no-files-found: error
+        path: |
+          extension/build/libs/da-opentelemetry-javaagent.jar
+          service/build/libs/service.jar
+          frontend/build/libs/frontend.jar
