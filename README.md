@@ -1,7 +1,7 @@
 
 # DA OpenTelemetry Agent & Service
 
-This project delivers an [OpenTelemetry Java Agent](https://opentelemetry.io/docs/instrumentation/java/automatic/) including a remotely configurable [sampler](https://opentelemetry.io/docs/concepts/sampling/), along with the accompanying REST service for configuring it. 
+This project delivers an [OpenTelemetry Java Agent](https://opentelemetry.io/docs/instrumentation/java/automatic/) including a remotely configurable [sampler](https://opentelemetry.io/docs/concepts/sampling/), along with the accompanying REST service (and optional front-end) for configuring it. 
 
 ![](system.png)
 
@@ -67,6 +67,22 @@ The service is delivered as a Docker image, ready to be deployed. The service is
 
 The configuration service can be secured using a API key. This is enabled by specifying `-Dotel.configuration.service.api.key="<key>"` as a JVM option when starting the service. The same property must be used when configuring the agent.
 
+## The Agent Configuration Frontend
+
+![](frontend-overview.png)
+
+The frontend is a basic Spring Boot, Thymeleaf and Bootstrap based service that can be used to get a quick overview of the sampler configurations while making it a bit easier to do the actual configuration. It also gives you quick access to the Jaeger interface for the service. It can be configured setting the `JAVA_OPTS` environment variable to something like this:
+
+```shell
+-Dotel.configuration.service.url=http://localhost:8080 \
+-Dotel.configuration.public.url=https://otelconfig.test \
+-Dotel.configuration.jaeger.url=https://jaeger.test \
+```
+
+As it is using JavaScript to access the backend service we need the public URL (`Route` on OpenShift).
+
+In order to secure it (if need be), we suggest using an _oauth proxy_ in front of the frontend.
+
 ## Usage
 
 There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both. 
@@ -76,15 +92,15 @@ A typical use case would be to set up a file based configuration while pointing 
 ### Example agent configuration
 
 ```shell
-  -javaagent:da-opentelemetry-javaagent.jar \
-  -Dotel.metrics.exporter=none \
-  -Dotel.service.name=my-service \
-  -Dotel.traces.sampler=dynamic \
-  -Dotel.configuration.readOnly=false \
-  -Dotel.configuration.service.file=otel-configuration-file.yaml \
-  -Dotel.configuration.service.url=http://otel-configuration-service.test \
-  -Dotel.exporter.otlp.endpoint=http://otel-collector.test:4317 \
-  -Dotel.traces.exporter=otlp
+-javaagent:da-opentelemetry-javaagent.jar \
+-Dotel.metrics.exporter=none \
+-Dotel.service.name=my-service \
+-Dotel.traces.sampler=dynamic \
+-Dotel.configuration.readOnly=false \
+-Dotel.configuration.service.file=otel-configuration-file.yaml \
+-Dotel.configuration.service.url=http://otel-configuration-service.test \
+-Dotel.exporter.otlp.endpoint=http://otel-collector.test:4317 \
+-Dotel.traces.exporter=otlp
 ```
 
 ```yaml

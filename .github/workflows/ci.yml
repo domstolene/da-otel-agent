@@ -36,3 +36,15 @@ jobs:
         name: da-opentelemetry-javaagent.jar
         path: extension/build/libs/da-opentelemetry-javaagent.jar
         if-no-files-found: error
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: service.jar
+        path: service/build/libs/service.jar
+        if-no-files-found: error
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: frontend.jar
+        path: frontend/build/libs/frontend.jar
+        if-no-files-found: error
