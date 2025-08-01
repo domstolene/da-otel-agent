@@ -5,15 +5,15 @@ plugins {
 }
 
 group = 'no.domstol.otel'
-version = '1.6.2'
+version = '1.7.0'
 
 sourceCompatibility = 11
 targetCompatibility = 11
 
 ext {
   versions = [
-    opentelemetrySdk           : "1.41.0",
-    opentelemetryJavaagent     : "1.33.6",
+    opentelemetrySdk           : "1.52.0",
+    opentelemetryJavaagent     : "2.18.1",
   ]
   jarToPublish = file( "build/libs/da-opentelemetry-javaagent.jar" )
   deps = [
@@ -81,7 +81,7 @@ dependencies {
   /*
     These dependencies are required both during compile and runtime.
   */
-  implementation "org.apache.commons:commons-lang3:3.12.0"
+  implementation "org.apache.commons:commons-lang3:3.18.0"
   implementation "org.apache.httpcomponents:httpclient:4.5.14"
   implementation "com.fasterxml.jackson.core:jackson-databind:2.15.2"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2"
