@@ -3,3 +3,4 @@
 !**/src/test/**/target/
 bin/
 build/
+.classpath
