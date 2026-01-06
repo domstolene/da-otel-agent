@@ -6,15 +6,15 @@ plugins {
 }
 
 group = 'no.domstol.otel'
-version = '1.7.3'
+version = '1.7.4'
 
 sourceCompatibility = 11
 targetCompatibility = 11
 
 ext {
   versions = [
-    opentelemetrySdk           : "1.52.0",
-    opentelemetryJavaagent     : "2.18.1",
+    opentelemetrySdk           : "1.57.0",
+    opentelemetryJavaagent     : "2.23.0",
   ]
   jarToPublish = file( "build/libs/da-opentelemetry-javaagent.jar" )
   deps = [
