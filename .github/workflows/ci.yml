@@ -23,7 +23,7 @@ jobs:
         distribution: 'temurin'
         
     - name: Gradle validate wrapper
-      uses: gradle/wrapper-validation-action@v3
+      uses: gradle/actions/wrapper-validation@v5
 
     - name: Gradle build
       uses: gradle/gradle-build-action@v2
