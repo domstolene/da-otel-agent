@@ -17,8 +17,10 @@ configurations {
     }
 }
 
-sourceCompatibility = 17
-targetCompatibility = 17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
@@ -32,6 +34,8 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.2'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 bootJar {
