@@ -10,7 +10,7 @@ version = '1.7.3'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
@@ -27,6 +27,10 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+springBoot {
+    mainClass = 'no.domstol.otel.agent.frontend.AgentConfigurationServiceFrontend'
 }
 
 bootJar {

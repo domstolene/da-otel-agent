@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -28,23 +27,25 @@ import io.opentelemetry.api.common.AttributeKey;
 public class AgentConfigurationTest {
 
     private String json =
-            "{\n" +
-            "  \"serviceName\" : \"da-otel-agent-service\",\n" +
-            "  \"sampler\" : \"parentbased_always_off\",\n" +
-            "  \"sampleRatio\" : 0.2,\n" +
-            "  \"readOnly\" : false,\n" +
-            "  \"timestamp\" : 0,\n" +
-            "  \"rules\" : [ {\n" +
-            "    \"exclude\" : [ {\n" +
-            "      \"http.target\" : \"/agent-configuration/.+\",\n" +
-            "      \"http.method\" : \"GET\"\n" +
-            "    } ]\n" +
-            "  }, {\n" +
-            "    \"include\" : [ {\n" +
-            "      \"http.method\" : \"POST\"\n" +
-            "    } ]\n" +
-            "  } ]\n" +
-            "}";
+            """
+            {
+              "serviceName" : "da-otel-agent-service",
+              "sampler" : "parentbased_always_off",
+              "sampleRatio" : 0.2,
+              "readOnly" : false,
+              "timestamp" : 0,
+              "rules" : [ {
+                "exclude" : [ {
+                  "http.target" : "/agent-configuration/.+",
+                  "http.method" : "GET"
+                } ]
+              }, {
+                "include" : [ {
+                  "http.method" : "POST"
+                } ]
+              } ]
+            }\
+            """;
 
     @Test
     public void testSetAndGetServiceName() {
@@ -70,7 +71,7 @@ public class AgentConfigurationTest {
     @Test
     public void testLoadConfigurationFile() throws StreamReadException, DatabindException, IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        Path file = Paths.get("src", "test", "resources", "traces-configuration.yaml");
+        Path file = Path.of("src", "test", "resources", "traces-configuration.yaml");
         AgentConfiguration configuration = yamlMapper.readValue(file.toFile(), AgentConfiguration.class);
 
         Map<String, List<Map<AttributeKey<String>, Pattern>>> rules = configuration.getRules();
@@ -82,7 +83,7 @@ public class AgentConfigurationTest {
     @Test
     public void testSerializeToJSON() throws StreamReadException, DatabindException, IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        Path file = Paths.get("src", "test", "resources", "traces-configuration.yaml");
+        Path file = Path.of("src", "test", "resources", "traces-configuration.yaml");
         AgentConfiguration configuration = yamlMapper.readValue(file.toFile(), AgentConfiguration.class);
         assertEquals(json, configuration.toString());
     }

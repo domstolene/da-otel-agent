@@ -8,6 +8,11 @@ plugins {
 group = 'no.domstol.otel'
 version = '1.7.4'
 
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(25)
+  }
+}
 
 ext {
   versions = [
@@ -127,7 +132,6 @@ tasks {
     inputs.files(layout.files(tasks.extendedAgent))
   }
   compileJava {
-    options.release.set(11)
   }
   assemble.dependsOn(shadowJar)
 }

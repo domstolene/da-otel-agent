@@ -18,8 +18,9 @@ configurations {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 repositories {
@@ -36,6 +37,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+springBoot {
+    mainClass = 'no.domstol.otel.agent.service.AgentConfigurationServiceApplication'
 }
 
 bootJar {
