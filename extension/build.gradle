@@ -14,7 +14,7 @@ targetCompatibility = 11
 ext {
   versions = [
     opentelemetrySdk           : "1.57.0",
-    opentelemetryJavaagent     : "2.23.0",
+    opentelemetryJavaagent     : "2.25.0",
   ]
   jarToPublish = file( "build/libs/da-opentelemetry-javaagent.jar" )
   deps = [
