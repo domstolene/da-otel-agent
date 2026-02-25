@@ -80,5 +80,5 @@ org.springframework:spring-test:6.2.12=testCompileClasspath,testRuntimeClasspath
 org.springframework:spring-web:6.2.12=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.springframework:spring-webmvc:6.2.12=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.xmlunit:xmlunit-core:2.10.4=testCompileClasspath,testRuntimeClasspath
-org.yaml:snakeyaml:2.2=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.yaml:snakeyaml:2.5=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 empty=annotationProcessor,testAndDevelopmentOnly,testAnnotationProcessor
