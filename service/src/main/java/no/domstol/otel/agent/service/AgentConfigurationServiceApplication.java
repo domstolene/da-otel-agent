@@ -28,7 +28,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class AgentConfigurationServiceApplication {
 
-	public static void main(String[] args) {
+	void main(String[] args) {
 		SpringApplication.run(AgentConfigurationServiceApplication.class, args);
 	}
 

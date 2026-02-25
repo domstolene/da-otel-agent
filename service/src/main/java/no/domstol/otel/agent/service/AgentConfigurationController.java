@@ -79,7 +79,7 @@ public class AgentConfigurationController {
         // For simplicity, return an OK response indicating success.
         if (configurations.size()>1)
         	return ResponseEntity.created(new URI("/agent-configuration/")).build();
-        else return ResponseEntity.created(new URI("/agent-configuration/" + configurations.get(0).getServiceName())).build();
+        else return ResponseEntity.created(new URI("/agent-configuration/" + configurations.getFirst().getServiceName())).build();
     }
     
     @GetMapping("/agent-configuration/{agentName}")

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -85,7 +84,7 @@ public class DynamicSamplerProvider implements ConfigurableSamplerProvider {
 
         public ConfigurationFileReader(String configurationServiceFile) {
             try {
-                path = Paths.get(configurationServiceFile);
+                path = Path.of(configurationServiceFile);
                 watchService = FileSystems.getDefault().newWatchService();
                 path.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
                 this.start();
