@@ -27,8 +27,8 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'io.micrometer:micrometer-core:1.11.1'
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.11.1'
+    implementation 'io.micrometer:micrometer-core:1.16.3'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.16.3'
     implementation 'org.yaml:snakeyaml:2.2'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
