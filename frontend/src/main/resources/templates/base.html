@@ -23,6 +23,16 @@
     <div layout:fragment="content">
     </div>
 
+    <footer class="border-top mt-4 py-3">
+        <div class="container text-body-secondary small">
+            Frontend version:
+            <span th:text="${frontendVersion}">unknown</span>
+            <span class="mx-2">|</span>
+            Service version:
+            <span th:text="${serviceVersion}">unknown</span>
+        </div>
+    </footer>
+
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header text-bg-success">

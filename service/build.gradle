@@ -8,6 +8,10 @@ plugins {
 group = 'no.domstol.otel'
 version = '1.7.5'
 
+springBoot {
+    buildInfo()
+}
+
 configurations {
     compileClasspath {
         resolutionStrategy.activateDependencyLocking()

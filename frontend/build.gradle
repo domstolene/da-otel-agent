@@ -8,6 +8,10 @@ plugins {
 group = 'no.domstol.otel'
 version = '1.7.5'
 
+springBoot {
+    buildInfo()
+}
+
 sourceCompatibility = 17
 targetCompatibility = 17
 
