@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="bin/generated-sources/annotations">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry output="bin/test" kind="src" path="bin/generated-test-sources/annotations">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin/default"/>
+	<classpathentry output="bin/main" kind="src" path="src/main/java">
+		<attributes>
+			<attribute name="gradle_scope" value="main"/>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry output="bin/test" kind="src" path="src/test/java">
+		<attributes>
+			<attribute name="gradle_scope" value="test"/>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry output="bin/test" kind="src" path="src/test/resources">
+		<attributes>
+			<attribute name="gradle_scope" value="test"/>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11/"/>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-extension-autoconfigure-spi/1.60.1/35881118999c5055e0ef8021aab703013ba9b94d/opentelemetry-sdk-extension-autoconfigure-spi-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-extension-autoconfigure-spi/1.60.1/47b85f94d2777ce5d1473d545b9e674d178313c2/opentelemetry-sdk-extension-autoconfigure-spi-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-exporter-otlp/1.60.1/668b84ea64f8e60ca4a5dbdc3ceaf39dc976fa1c/opentelemetry-exporter-otlp-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-exporter-otlp/1.60.1/3fbd1110e980455850a5dcb2e8890e29b3b346a9/opentelemetry-exporter-otlp-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.auto.service/auto-service/1.1.1/8706b8cb2d8ef5868217fe6347eefa3d6f94af35/auto-service-1.1.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.auto.service/auto-service/1.1.1/bfeb4c40087b49e23700f074807d3f2a6d36d2d1/auto-service-1.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.18.0/aa3b54d85731a9cba78c647926ff0d0f9aaa16ea/commons-lang3-3.18.0-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.18.0/fb14946f0e39748a6571de0635acbe44e7885491/commons-lang3-3.18.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.5.14/14321a360aa0e037c56d4c820747a84954d9196e/httpclient-4.5.14-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.5.14/1194890e6f56ec29177673f2f12d0b8e627dec98/httpclient-4.5.14.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.15.2/7458734de3b894cff3f3744ab11ff79b635c80e2/jackson-annotations-2.15.2-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.15.2/4724a65ac8e8d156a24898d50fd5dbd3642870b8/jackson-annotations-2.15.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.15.2/4d3e4ff17d2cda69f8fd692694c304ff38a75823/jackson-core-2.15.2-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.15.2/a6fe1836469a69b3ff66037c324d75fc66ef137c/jackson-core-2.15.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.15.2/258e40b2ebed34c4d185d81ca8a65e6414728e39/jackson-dataformat-yaml-2.15.2-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.15.2/58194ff9f51915ad6bf6b6f24818232d7566418a/jackson-dataformat-yaml-2.15.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.15.2/32d4d520f3e46e7b2c2d4d863d8f2f381af4fa6/jackson-databind-2.15.2-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.15.2/9353b021f10c307c00328f52090de2bdb4b6ff9c/jackson-databind-2.15.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.auto/auto-common/1.2.1/577cbbc5edac4eb04d9009a09d379a70f27ac583/auto-common-1.2.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.auto/auto-common/1.2.1/f6da26895f759010f5f170c8044e84c1b17ef83e/auto-common-1.2.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/32.0.1-jre/f491b792f07e0a5dc5a6695ea2f3632263b317e4/guava-32.0.1-jre-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/32.0.1-jre/6e5d51a72d142f2d40a57dfb897188b36a95b489/guava-32.0.1-jre.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/b421526c5f297295adef1c886e5246c39d4ac629/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk/1.60.1/ec7743d6d13756257dd0d28e942eac9f10f97ad3/opentelemetry-sdk-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk/1.60.1/3e7636ca532e0bff7ba3c132807785dbe0d44c7f/opentelemetry-sdk-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-metrics/1.60.1/6e50be4305f6e56d6a22aaa8d04b52d06d1114be/opentelemetry-sdk-metrics-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-metrics/1.60.1/16f463873a923ef1eb2391e2df2c9a18b2ce0b6f/opentelemetry-sdk-metrics-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-trace/1.60.1/724321196be6005fef05c7aa26396a74024d930c/opentelemetry-sdk-trace-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-trace/1.60.1/32c79993d8403ac08e330d53d8375eae20dffd04/opentelemetry-sdk-trace-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-logs/1.60.1/7372ed7e787f699078b9db64642c100eb668a931/opentelemetry-sdk-logs-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-logs/1.60.1/31cc57d5a122b9a72fd38c6bda1b7fa9baf0ca19/opentelemetry-sdk-logs-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-common/1.60.1/2ca057ec95791acbd7cf0a9c487046a0c1d2fadd/opentelemetry-sdk-common-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-sdk-common/1.60.1/71d4fcd2a690339a510250638c289a38ec3d87fa/opentelemetry-sdk-common-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-api/1.60.1/c3c5bdf9c7bab27001c7257abe35acdb07ace578/opentelemetry-api-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-api/1.60.1/67a515491f676e9ac9719839a97cbde7b1ffc2c2/opentelemetry-api-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-context/1.60.1/e130c67f0faff021b70b5dac8673a3dca3836f58/opentelemetry-context-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-context/1.60.1/d525534a510c73d1bdc7c6abf9d737214f821/opentelemetry-context-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-common/1.60.1/da3aeae60fb94e70c27222999cd5cbb98011aa43/opentelemetry-common-1.60.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-common/1.60.1/5dac05298857f292183de4ab5ea56bb7fe272daf/opentelemetry-common-1.60.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/2.8/74fb66e276fc42784d884d51f841e35232bc90de/j2objc-annotations-2.8-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/2.8/c85270e307e7b822f1086b93689124b89768e273/j2objc-annotations-2.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/b19b5927c2c25b6c70f093767041e641ae0b1b35/jsr305-3.0.2-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.11/bce4ba84fd527950e35040b20a991c63e90e2850/commons-codec-1.11-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.11/3acb4705652e16236558f0f4f2192cc33c3bd189/commons-codec-1.11.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.auto.service/auto-service-annotations/1.1.1/b855be4f39e0fe5bb27dd137fd37dd4c4e2c2f5a/auto-service-annotations-1.1.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.auto.service/auto-service-annotations/1.1.1/da12a15cd058ba90a0ff55357fb521161af4736d/auto-service-annotations-1.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.4.16/229e4c0eae80465381ae02adf61bca5558360777/httpcore-4.4.16-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.4.16/51cf043c87253c9f58b539c9f7e44c8894223850/httpcore-4.4.16.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.2/ecf26c7507d67782a3bbd148d170b31dfad001aa/commons-logging-1.2-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.2/4bfc12adfe4842bf07b657f0369c4cb522955686/commons-logging-1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/3.33.0/ee4ecf6c55e3f2b05b839aa05c70f1298437ebe9/checker-qual-3.33.0-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/3.33.0/de2b60b62da487644fc11f734e73c8b0b431238f/checker-qual-3.33.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.guava/failureaccess/1.0.1/1d064e61aad6c51cc77f9b59dc2cccc78e792f5a/failureaccess-1.0.1-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.guava/failureaccess/1.0.1/1dcf1de382a0bf95a3d8b0849546c88bac1292c9/failureaccess-1.0.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/2.0/b29e84cfffae4be26d4a4c9443d9f246ad4ec63e/snakeyaml-2.0-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/2.0/3aab2116756442bf0d4cd1c089b24d34c3baa253/snakeyaml-2.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.18.0/8781f46ef842929cf22e83273ef0d2091b96845f/error_prone_annotations-2.18.0-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.18.0/89b684257096f548fa39a7df9fdaa409d4d4df91/error_prone_annotations-2.18.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.9.3/819f0849cf19b1f46718c36a4fc8406c87bced45/junit-platform-engine-1.9.3-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.9.3/8616734a190f8d307376aeb7353dba0a2c037a09/junit-platform-engine-1.9.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.9.3/85988e8197299a175eb2576f8f069fc84299a9f4/junit-jupiter-api-5.9.3-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.9.3/815818ad6ffcc8d320d8fbdf3d748c753cf83201/junit-jupiter-api-5.9.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.9.3/86401c81baae1d05c5dc76d3e40c1b9397384eda/junit-platform-commons-1.9.3-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.9.3/36b2e26a90c41603be7f0094bee80e3f8a2cd4d4/junit-platform-commons-1.9.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.9.3/197892276ba628c4cdca0ab3168f9c24ce6c73f8/junit-jupiter-engine-5.9.3-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.9.3/355322b03bf39306a183162cd06626c206f0286b/junit-jupiter-engine-5.9.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/e0787a997746ac32639e0bf3cb27af8dce8a3428/apiguardian-api-1.1.2-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/a231e0d844d2721b0fa1b238006d15c6ded6842a/apiguardian-api-1.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/41d55b3c2254de9837b4ec8923cbd371b8a7eab5/opentest4j-1.2.0-sources.jar" kind="lib" path="/Users/torkild/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/28c11eb91f9b6d8e200631d46e20a7f407f2a046/opentest4j-1.2.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+</classpath>
