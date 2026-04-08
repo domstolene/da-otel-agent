@@ -90,7 +90,7 @@ dependencies {
   /*
   For tests
   */
-  testImplementation "org.junit.jupiter:junit-jupiter-engine:5.9.3"
+  testImplementation "org.junit.jupiter:junit-jupiter-engine:6.0.3"
   testImplementation "io.opentelemetry:opentelemetry-api:${versions.opentelemetrySdk}"
 
 
