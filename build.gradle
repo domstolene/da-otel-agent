@@ -3,6 +3,8 @@ plugins {
 }
 
 subprojects {
+  ext['tomcat.version'] = '10.1.55'
+
   dependencyLocking {
     lockAllConfigurations()
   }

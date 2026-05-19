@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'no.domstol.otel'
-version = '1.7.5'
+version = '1.7.6'
 
 springBoot {
     buildInfo()
