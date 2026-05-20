@@ -127,7 +127,7 @@ Now run `build-and-test.sh`. This will build the agent, run the tests, start the
 Since the configuration service is not started when it's being instrumented, obtaining the remote configuration will fail and defaults will be used. You will see something like this in the log:
 
 ```
-opentelemetry-javaagent - version: 1.29.0
+opentelemetry-javaagent - version: 2.28.0
 Could not connect to OTEL Configuration Service at http://localhost:8080,
 using sampler "parentbased_always_off".
 ```
