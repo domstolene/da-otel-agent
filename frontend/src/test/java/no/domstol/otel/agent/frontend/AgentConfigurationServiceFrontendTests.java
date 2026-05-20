@@ -44,7 +44,7 @@ class AgentConfigurationServiceFrontendTests {
 	void listConfigurationsAddsRunningVersionsToModel() {
 		RestTemplate restTemplate = new RestTemplate();
 		MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-		AgentConfigurationController controller = new AgentConfigurationController(restTemplate, "1.7.6-frontend");
+		AgentConfigurationController controller = new AgentConfigurationController(restTemplate, "1.7.7-frontend");
 		ExtendedModelMap model = new ExtendedModelMap();
 
 		server.expect(requestTo("http://localhost:8080/agent-configuration"))
@@ -71,7 +71,7 @@ class AgentConfigurationServiceFrontendTests {
 		List<?> configs = (List<?>) model.getAttribute("configs");
 
 		assertThat(view).isEqualTo("listConfigurations");
-		assertThat(model.getAttribute("frontendVersion")).isEqualTo("1.7.6-frontend");
+		assertThat(model.getAttribute("frontendVersion")).isEqualTo("1.7.7-frontend");
 		assertThat(model.getAttribute("serviceVersion")).isEqualTo("1.7.5");
 		assertThat(configs).hasSize(1);
 		assertThat(((AgentConfiguration) configs.get(0)).getServiceName()).isEqualTo("test-service");
@@ -84,7 +84,7 @@ class AgentConfigurationServiceFrontendTests {
 	void listConfigurationsFallsBackToUnknownServiceVersion() {
 		RestTemplate restTemplate = new RestTemplate();
 		MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-		AgentConfigurationController controller = new AgentConfigurationController(restTemplate, "1.7.6-frontend");
+		AgentConfigurationController controller = new AgentConfigurationController(restTemplate, "1.7.7-frontend");
 		ExtendedModelMap model = new ExtendedModelMap();
 
 		server.expect(requestTo("http://localhost:8080/agent-configuration"))
@@ -94,7 +94,7 @@ class AgentConfigurationServiceFrontendTests {
 
 		controller.listConfigurations(model);
 
-		assertThat(model.getAttribute("frontendVersion")).isEqualTo("1.7.6-frontend");
+		assertThat(model.getAttribute("frontendVersion")).isEqualTo("1.7.7-frontend");
 		assertThat(model.getAttribute("serviceVersion")).isEqualTo("unknown");
 		server.verify();
 	}
