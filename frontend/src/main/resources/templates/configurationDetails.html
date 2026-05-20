@@ -113,7 +113,7 @@
             <hr>
             <p><b>Read only:</b> <span th:text="${config.readOnly}">false</span></p>
             <p><b>Last changed:</b> <span id="timestamp"
-                    th:text="${#dates.format(config.timestamp, 'yyyy-MM-dd HH:mm:ss')}">Timestamp</span></p>
+                    th:text="${formattedTimestamp}">Timestamp</span></p>
             <div>
                 <form>
                     <div>
@@ -121,7 +121,7 @@
                         <select class="form-select form-control" id="sampler" th:disabled="${config.readOnly}"
                             th:name="sampler">
                             <option
-                                th:each="samplerType : ${T(no.domstol.otel.agent.service.AgentConfiguration.SamplerType).values()}"
+                                th:each="samplerType : ${samplerTypes}"
                                 th:value="${samplerType}" th:text="${samplerType}"
                                 th:selected="${config.sampler == samplerType}">
                             </option>
@@ -136,9 +136,9 @@
 					<div>
 					  <div class="row">
                         <label style="display: block;" for="rules-textarea" class="form-label">Filter rules:</label>
-					    <div class="col-sm">
-	                        <textarea id="rules-textarea" class="form-control font-monospace" rows="10" style="width:100%"
-	                            th:text="${@configurationRenderer.getFormattedRules(config)}" placeholder="# EXAMPLE RULES
+						    <div class="col-sm">
+		                        <textarea id="rules-textarea" class="form-control font-monospace" rows="10" style="width:100%"
+		                            th:text="${formattedRules}" placeholder="# EXAMPLE RULES
 exclude:
   - http.target: &quot;/health/.+&quot;
     http.method: &quot;GET&quot;

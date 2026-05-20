@@ -35,7 +35,7 @@
 							<select class="form-select" th:id="'sampler-' + ${config.serviceName}"
 								th:disabled="${config.readOnly}" th:name="sampler">
 								<option
-									th:each="samplerType : ${T(no.domstol.otel.agent.service.AgentConfiguration.SamplerType).values()}"
+									th:each="samplerType : ${samplerTypes}"
 									th:value="${samplerType}" th:text="${samplerType}"
 									th:selected="${config.sampler == samplerType}">
 								</option>
@@ -55,7 +55,7 @@
 									<i class="bi bi-filter-square-fill btn btn-outline-secondary" data-bs-html="true" data-bs-trigger="hover"
 										data-bs-toggle="popover" data-bs-sanitize="false" data-bs-title="Filter rules"
 										data-bs-custom-class="popover-wider"
-										th:attr="data-bs-content='<pre>' + ${@configurationRenderer.getFormattedRules(config)} + '</pre>'">
+										th:attr="data-bs-content=${rulesPopoverContent[config.serviceName]}">
 									</i>
 								</span>
 								<!-- Empty icon when rules are not present -->
@@ -69,7 +69,7 @@
 							</a>
 						</td>
 						<td th:attr="id=|timestamp-${config.serviceName}|"
-							th:text="${#dates.format(new java.util.Date(config.timestamp), 'yyyy-MM-dd HH:mm:ss')}">
+							th:text="${formattedTimestamps[config.serviceName]}">
 						</td>
 						<td>
 							<button type="button" class="btn btn-outline-primary" title="Click to save configuration changes"
@@ -84,7 +84,6 @@
 							</button>
 						</td>
 					</tr>
-					</a>
 				</tbody>
 			</table>
 		</div>
