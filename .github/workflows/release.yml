@@ -10,8 +10,8 @@ on:
 # workflow builds.
 env:
   REGISTRY: ghcr.io
-  SERVICE_IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
-  FRONTEND_IMAGE_NAME:  domstolene/da-otel-agent-configuration-frontend
+  SERVICE_IMAGE_NAME:  domstolene/da-otel-agent/configuration-service
+  FRONTEND_IMAGE_NAME:  domstolene/da-otel-agent/configuration-frontend
 
 jobs:
   build-test-and-publish-release:
