@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'no.domstol.otel'
-version = '1.7.7'
+version = findProperty('releaseVersion') ?: 'development'
 
 sourceCompatibility = 11
 targetCompatibility = 11
