@@ -1,31 +1,38 @@
 name: Build and publish release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - '*.*.*'
 
-  workflow_dispatch:
-
-# Defines two custom environment variables for the workflow. These are used for 
+# Defines two custom environment variables for the workflow. These are used for
 # the Container registry domain, and a name for the Docker image that this
 # workflow builds.
 env:
   REGISTRY: ghcr.io
-  SERVICE_IMAGE_NAME:  domstolene/da-otel-agent-configuration-service
-  FRONTEND_IMAGE_NAME:  domstolene/da-otel-agent-configuration-frontend
+  SERVICE_IMAGE_NAME:  domstolene/da-otel-agent/configuration-service
+  FRONTEND_IMAGE_NAME:  domstolene/da-otel-agent/configuration-frontend
 
 jobs:
-  build-and-test-artifacts:  
+  build-test-and-publish-release:
 
-    name: Build and test artifacts
+    name: Build, test and publish release
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
+    - name: Assert numeric version tag
+      run: |
+        version="${{ github.ref_name }}"
+        if ! echo "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "Invalid tag '$version'. Expected numeric format x.y.z"
+          exit 1
+        fi
+
     - uses: actions/checkout@v6
-    
+
     - name: Set up JDK 21
       uses: actions/setup-java@v5
       with:
@@ -39,36 +46,24 @@ jobs:
       run: ./gradlew build --no-daemon
 
     - name: Gradle publish agent
-      env: 
+      env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_ACTOR: ${{ github.actor }}
       run: ./gradlew publish --no-daemon
 
-    # Upload extension JAR for use in next job.
-    - uses: actions/upload-artifact@v6
-      with:
-        name: da-opentelemetry-javaagent.jar
-        path: extension/build/libs/da-opentelemetry-javaagent.jar
-        if-no-files-found: error
-
-    # Upload service JAR for use in next job.
-    - uses: actions/upload-artifact@v6
-      with:
-        name: service.jar
-        path: service/build/libs/service.jar
-        if-no-files-found: error
-
-    # Upload frontend JAR for use in next job.
-    - uses: actions/upload-artifact@v6
-      with:
-        name: frontend.jar
-        path: frontend/build/libs/frontend.jar
-        if-no-files-found: error
+    - name: Create release and upload agent JAR
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ github.ref_name }}" \
+          extension/build/libs/da-opentelemetry-javaagent.jar \
+          --repo "${{ github.repository }}" \
+          --generate-notes
 
   # Build and publish SERVICE container image.
   build-and-push-service-image:
     name: Build and push service image
-    needs: build-and-test-artifacts
+    needs: build-test-and-publish-release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -83,28 +78,29 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-        
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.SERVICE_IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
-            type=raw,value=${{ github.ref_name }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=semver,pattern={{version}},value=${{ github.ref_name }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ github.ref_name }}
           flavor: |
             latest=auto
 
-      - name: Download da-opentelemetry-javaagent.jar from previous job
-        uses: actions/download-artifact@v8
-        with:
-          name: da-opentelemetry-javaagent.jar
+      - name: Build service jar
+        run: ./gradlew :service:bootJar --no-daemon
 
-      - name: Download service.jar from previous job
-        uses: actions/download-artifact@v8
-        with:
-          name: service.jar
+      - name: Prepare service jar for Docker build context
+        run: cp service/build/libs/service.jar service.jar
+
+      - name: Download da-opentelemetry-javaagent.jar from release
+        run: |
+          curl -fLsS \
+            "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/da-opentelemetry-javaagent.jar" \
+            -o da-opentelemetry-javaagent.jar
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -114,7 +110,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
-        
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
@@ -128,7 +124,7 @@ jobs:
   # Build and publish FRONTEND container image.
   build-and-push-frontend-image:
     name: Build and push frontend image
-    needs: build-and-test-artifacts
+    needs: build-test-and-publish-release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -143,28 +139,29 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-        
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
-            type=raw,value=${{ github.ref_name }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=semver,pattern={{version}},value=${{ github.ref_name }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ github.ref_name }}
           flavor: |
-            latest=auto            
+            latest=auto
 
-      - name: Download da-opentelemetry-javaagent.jar from previous job
-        uses: actions/download-artifact@v8
-        with:
-          name: da-opentelemetry-javaagent.jar
+      - name: Build frontend jar
+        run: ./gradlew :frontend:bootJar --no-daemon
 
-      - name: Download frontend.jar from previous job
-        uses: actions/download-artifact@v8
-        with:
-          name: frontend.jar
+      - name: Prepare frontend jar for Docker build context
+        run: cp frontend/build/libs/frontend.jar frontend.jar
+
+      - name: Download da-opentelemetry-javaagent.jar from release
+        run: |
+          curl -fLsS \
+            "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/da-opentelemetry-javaagent.jar" \
+            -o da-opentelemetry-javaagent.jar
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -174,7 +171,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
-        
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:

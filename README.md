@@ -1,7 +1,7 @@
 
 # DA OpenTelemetry Agent & Service
 
-This project delivers an [OpenTelemetry Java Agent](https://opentelemetry.io/docs/instrumentation/java/automatic/) including a remotely configurable [sampler](https://opentelemetry.io/docs/concepts/sampling/), along with the accompanying REST service (and optional front-end) for configuring it. 
+This project delivers an [OpenTelemetry Java Agent](https://opentelemetry.io/docs/instrumentation/java/automatic/) including a remotely configurable [sampler](https://opentelemetry.io/docs/concepts/sampling/), along with the accompanying REST service (and optional front-end) for configuring it.
 
 ![](system.png)
 
@@ -85,7 +85,7 @@ In order to secure it (if need be), we suggest using an _oauth proxy_ in front o
 
 ## Usage
 
-There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both. 
+There are basically three ways of configuring the agent. Either you use a file-based configuration, a service-based, or both.
 
 A typical use case would be to set up a file based configuration while pointing to the service. In this case the agent will load and use the configuration from the file. It will connect to the service, and if the the agent is not registered there, upload the current configuration. If the configuration is changed on the service, the agent will update and use this version, unless the `readOnly` flag is set to true. The configuration file will automatically be reloaded if changed.
 
@@ -166,3 +166,33 @@ Changing sampler to AlwaysOnSampler
 ```
 
 The `DynamicSamplerProvider` will poll the service at regular intervals (currently each 30s) to check for updated configurations. You should be able to see this in the Jaeger UI.
+
+## Releasing
+
+Releases are created from Git tags using the [release workflow](.github/workflows/release.yml). The workflow is compatible with GitHub immutable releases because it creates the release itself only after a successful build.
+
+Do not create releases manually in the GitHub UI.
+
+### Steps
+
+1. Make sure the `main` branch contains the version you want to release.
+2. Create an annotated version tag (for example `1.2.3`):
+
+```bash
+git checkout main
+git pull
+git tag -a 1.2.3 -m "Release 1.2.3"
+git push origin 1.2.3
+```
+
+3. Wait for the `Build and publish release` workflow to complete.
+
+When successful, the workflow will:
+
+1. Build and test the project.
+2. Publish the agent artifact and create a GitHub release with `da-opentelemetry-javaagent.jar` attached.
+3. Build and push service/frontend container images.
+
+Download URL format for released agent JAR:
+
+`https://github.com/domstolene/da-otel-agent/releases/download/<version>/da-opentelemetry-javaagent.jar`
