@@ -68,7 +68,10 @@ jobs:
         # queries: security-extended,security-and-quality
 
     - name: Gradle build
-      run: ./gradlew build --no-daemon -PGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -PGITHUB_USER=${{ github.actor }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ github.actor }}
+      run: ./gradlew compileJava --no-daemon
       
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
