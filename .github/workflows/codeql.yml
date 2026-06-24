@@ -71,7 +71,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_ACTOR: ${{ github.actor }}
-      run: ./gradlew clean compileJava --no-daemon
+      run: >-
+        ./gradlew --no-daemon --no-build-cache --rerun-tasks
+        :extension:clean :service:clean :frontend:clean
+        :extension:compileJava :service:compileJava :frontend:compileJava
       
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
