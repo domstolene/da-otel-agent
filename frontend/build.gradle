@@ -8,7 +8,7 @@ plugins {
 group = 'no.domstol.otel'
 version = '1.7.7'
 
-ext['jackson-bom.version'] = '2.21.4'
+ext['jackson-bom.version'] = '2.22.0'
 
 springBoot {
     buildInfo()
