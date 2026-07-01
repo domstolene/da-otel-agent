@@ -9,8 +9,8 @@ group = 'no.domstol.otel'
 version = findProperty('releaseVersion') ?: 'development'
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
 }
 
 ext {
@@ -93,7 +93,7 @@ dependencies {
   /*
   For tests
   */
-  testImplementation "org.junit.jupiter:junit-jupiter-engine:6.1.0"
+  testImplementation "org.junit.jupiter:junit-jupiter-engine:6.1.1"
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"
   testImplementation "io.opentelemetry:opentelemetry-api:${versions.opentelemetrySdk}"
 
