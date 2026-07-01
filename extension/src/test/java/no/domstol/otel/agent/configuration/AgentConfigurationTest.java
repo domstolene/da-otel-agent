@@ -18,10 +18,10 @@ import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 
 import io.opentelemetry.api.common.AttributeKey;
 
@@ -29,11 +29,7 @@ public class AgentConfigurationTest {
 
     private String json =
             "{\n" +
-            "  \"serviceName\" : \"da-otel-agent-service\",\n" +
-            "  \"sampler\" : \"parentbased_always_off\",\n" +
-            "  \"sampleRatio\" : 0.2,\n" +
             "  \"readOnly\" : false,\n" +
-            "  \"timestamp\" : 0,\n" +
             "  \"rules\" : [ {\n" +
             "    \"exclude\" : [ {\n" +
             "      \"http.target\" : \"/agent-configuration/.+\",\n" +
@@ -43,7 +39,11 @@ public class AgentConfigurationTest {
             "    \"include\" : [ {\n" +
             "      \"http.method\" : \"POST\"\n" +
             "    } ]\n" +
-            "  } ]\n" +
+            "  } ],\n" +
+            "  \"sampleRatio\" : 0.2,\n" +
+            "  \"sampler\" : \"parentbased_always_off\",\n" +
+            "  \"serviceName\" : \"da-otel-agent-service\",\n" +
+            "  \"timestamp\" : 0\n" +
             "}";
 
     @Test

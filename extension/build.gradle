@@ -1,6 +1,6 @@
 plugins {
   id "java"
-  id "com.gradleup.shadow" version "9.4.2"
+  alias(libs.plugins.shadow)
   id "maven-publish"
   id "eclipse"
 }
@@ -14,15 +14,7 @@ java {
 }
 
 ext {
-  versions = [
-    opentelemetrySdk           : "1.62.0",
-    opentelemetryJavaagent     : "2.28.0",
-    jackson                    : "2.22.0",
-  ]
-  jarToPublish = file( "build/libs/da-opentelemetry-javaagent.jar" )
-  deps = [
-    autoservice: dependencies.create(group: "com.google.auto.service", name: "auto-service", version: "1.1.1")
-  ]
+  jarToPublish = file("build/libs/da-opentelemetry-javaagent.jar")
 }
 
 repositories {
@@ -65,41 +57,41 @@ configurations {
 }
 
 dependencies {
-  implementation(platform("io.opentelemetry:opentelemetry-bom:${versions.opentelemetrySdk}"))
+  implementation(platform(libs.opentelemetry.bom))
+  implementation(platform(libs.jackson.bom))
 
   /*
     Interfaces and SPIs that we implement. We use `compileOnly` dependency
     because during runtime all necessary classes are provided by javaagent
     itself.
    */
-  compileOnly "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi"
-  compileOnly "io.opentelemetry:opentelemetry-exporter-otlp"
+  compileOnly(libs.opentelemetry.sdk.extension.autoconfigure.spi)
+  compileOnly(libs.opentelemetry.exporter.otlp)
 
   /*
     Provides @AutoService annotation that makes registration of our SPI
     implementations much easier.
   */
-  compileOnly deps.autoservice
-  annotationProcessor deps.autoservice
+  compileOnly(libs.auto.service)
+  annotationProcessor(libs.auto.service)
 
   /*
     These dependencies are required both during compile and runtime.
   */
-  implementation "org.apache.commons:commons-lang3:3.18.0"
-  implementation "org.apache.httpcomponents:httpclient:4.5.14"
-  implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}"
-  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
+  implementation(libs.commons.lang3)
+  implementation(libs.httpclient)
+  implementation(libs.jackson.databind)
+  implementation(libs.jackson.dataformat.yaml)
 
   /*
   For tests
   */
-  testImplementation "org.junit.jupiter:junit-jupiter-engine:6.1.1"
-  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-  testImplementation "io.opentelemetry:opentelemetry-api:${versions.opentelemetrySdk}"
-
+  testImplementation(libs.junit.jupiter.engine)
+  testRuntimeOnly(libs.junit.platform.launcher)
+  testImplementation(libs.opentelemetry.api)
 
   // Otel Java instrumentation that we use and extend during integration tests
-  otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
+  otel(libs.opentelemetry.javaagent)
 }
 
 /*
