@@ -1,6 +1,6 @@
 plugins {
   id "java"
-  id "com.github.johnrengelman.shadow" version "8.1.1"
+  id "com.gradleup.shadow" version "9.4.2"
   id "maven-publish"
   id "eclipse"
 }
@@ -8,8 +8,10 @@ plugins {
 group = 'no.domstol.otel'
 version = findProperty('releaseVersion') ?: 'development'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
 
 ext {
   versions = [
@@ -92,6 +94,7 @@ dependencies {
   For tests
   */
   testImplementation "org.junit.jupiter:junit-jupiter-engine:5.9.3"
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
   testImplementation "io.opentelemetry:opentelemetry-api:${versions.opentelemetrySdk}"
 
 
