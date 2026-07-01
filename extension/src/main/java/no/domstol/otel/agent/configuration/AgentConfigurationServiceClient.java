@@ -35,8 +35,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
@@ -121,7 +121,7 @@ public class AgentConfigurationServiceClient {
     }
 
     private void updateRemoteConfiguration(AgentConfiguration configuration, String configurationServiceUrl, String apiKey)
-            throws UnsupportedCharsetException, JsonProcessingException {
+            throws UnsupportedCharsetException, JacksonException {
         HttpPut request = new HttpPut(
                 configurationServiceUrl + "/agent-configuration/" + configuration.getServiceName());
         if (apiKey != null)
@@ -144,7 +144,7 @@ public class AgentConfigurationServiceClient {
     }
 
     private void selfRegister(AgentConfiguration configuration, String configurationServiceUrl, String apiKey)
-            throws UnsupportedCharsetException, JsonProcessingException {
+            throws UnsupportedCharsetException, JacksonException {
             HttpPost postRequest = new HttpPost(configurationServiceUrl + "/agent-configuration");
             if (apiKey != null)
                 postRequest.addHeader(API_KEY_HEADER, apiKey);

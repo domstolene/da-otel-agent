@@ -1,0 +1,46 @@
+[versions]
+opentelemetry-sdk        = "1.62.0"
+opentelemetry-javaagent  = "2.28.0"
+jackson                  = "3.2.0"
+auto-service             = "1.1.1"
+commons-lang3            = "3.18.0"
+httpclient               = "4.5.14"
+junit-jupiter            = "6.1.1"
+snakeyaml                = "2.2"
+thymeleaf-layout-dialect = "3.2.1"
+shadow                   = "9.4.2"
+spring-boot              = "4.1.0"
+spring-dependency-management = "1.1.7"
+# NB: foojay-versjonen brukes i settings.gradle sin plugins-blokk der versjonskatalog
+# ikke er tilgjengelig ennå, og må derfor forbli hardkodet der.
+
+[libraries]
+# OpenTelemetry BOMs og runtime-agent (versjoner styrt via version.ref)
+opentelemetry-bom        = { module = "io.opentelemetry:opentelemetry-bom",                                version.ref = "opentelemetry-sdk" }
+opentelemetry-javaagent  = { module = "io.opentelemetry.javaagent:opentelemetry-javaagent",                version.ref = "opentelemetry-javaagent" }
+
+# OpenTelemetry API/SPI (versjoner styrt av opentelemetry-bom)
+opentelemetry-api                            = { module = "io.opentelemetry:opentelemetry-api" }
+opentelemetry-sdk-extension-autoconfigure-spi = { module = "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi" }
+opentelemetry-exporter-otlp                  = { module = "io.opentelemetry:opentelemetry-exporter-otlp" }
+
+# Jackson BOM (versjon styrt via version.ref)
+jackson-bom              = { module = "tools.jackson:jackson-bom",                   version.ref = "jackson" }
+
+# Jackson-biblioteker (versjoner styrt av jackson-bom)
+jackson-databind         = { module = "tools.jackson.core:jackson-databind" }
+jackson-dataformat-yaml  = { module = "tools.jackson.dataformat:jackson-dataformat-yaml" }
+
+# Øvrige avhengigheter
+auto-service             = { module = "com.google.auto.service:auto-service",        version.ref = "auto-service" }
+commons-lang3            = { module = "org.apache.commons:commons-lang3",            version.ref = "commons-lang3" }
+httpclient               = { module = "org.apache.httpcomponents:httpclient",         version.ref = "httpclient" }
+junit-jupiter-engine     = { module = "org.junit.jupiter:junit-jupiter-engine",       version.ref = "junit-jupiter" }
+junit-platform-launcher  = { module = "org.junit.platform:junit-platform-launcher" }
+snakeyaml                = { module = "org.yaml:snakeyaml",                          version.ref = "snakeyaml" }
+thymeleaf-layout-dialect = { module = "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect", version.ref = "thymeleaf-layout-dialect" }
+
+[plugins]
+shadow                       = { id = "com.gradleup.shadow",         version.ref = "shadow" }
+spring-boot                  = { id = "org.springframework.boot",     version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }

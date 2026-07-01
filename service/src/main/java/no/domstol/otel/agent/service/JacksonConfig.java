@@ -16,8 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package no.domstol.otel.agent.service;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import tools.jackson.databind.DeserializationFeature;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,8 +25,8 @@ import org.springframework.context.annotation.Configuration;
 public class JacksonConfig {
 
     @Bean
-    Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
-        return builder -> builder.featuresToEnable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    JsonMapperBuilderCustomizer jacksonCustomizer() {
+        return builder -> builder.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
-    
+
 }
