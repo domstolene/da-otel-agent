@@ -8,7 +8,7 @@ httpclient               = "4.5.14"
 junit-jupiter            = "6.1.1"
 snakeyaml                = "2.2"
 thymeleaf-layout-dialect = "3.2.1"
-shadow                   = "9.4.2"
+shadow                   = "9.4.3"
 spring-boot              = "4.1.0"
 spring-dependency-management = "1.1.7"
 # NB: foojay-versjonen brukes i settings.gradle sin plugins-blokk der versjonskatalog
