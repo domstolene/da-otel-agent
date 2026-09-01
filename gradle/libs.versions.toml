@@ -1,7 +1,7 @@
 [versions]
 opentelemetry-sdk        = "1.63.0"
 opentelemetry-javaagent  = "2.29.0"
-jackson                  = "3.2.0"
+jackson                  = "3.2.1"
 auto-service             = "1.1.1"
 commons-lang3            = "3.18.0"
 httpclient               = "4.5.14"

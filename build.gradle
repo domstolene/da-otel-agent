@@ -3,6 +3,10 @@ plugins {
 }
 
 subprojects {
+  // Override Spring Boot's managed versions with patched releases.
+  ext['jackson-2-bom.version'] = '2.22.1'
+  ext['jackson-bom.version'] = libs.versions.jackson.get()
+  ext['log4j2.version'] = '2.25.5'
   ext['tomcat.version'] = '10.1.55'
   ext['thymeleaf.version'] = '3.1.5.RELEASE'
 
