@@ -75,6 +75,12 @@ dependencies {
   compileOnly(libs.auto.service)
   annotationProcessor(libs.auto.service)
 
+  // auto-service pulls in a vulnerable guava transitively (CVE-2026-102554)
+  constraints {
+    compileOnly("com.google.guava:guava:33.7.2-jre")
+    annotationProcessor("com.google.guava:guava:33.7.2-jre")
+  }
+
   /*
     These dependencies are required both during compile and runtime.
   */
