@@ -1,6 +1,6 @@
 services:
   jaeger:
-    image: cr.jaegertracing.io/jaegertracing/jaeger:2.23.0
+    image: jaegertracing/jaeger:2.23.0
     ports:
       - 16686:16686
       - 4317:4317
