@@ -144,7 +144,9 @@ class AgentConfigurationServiceFrontendTests {
 		mockMvc.perform(get("/"))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("test-service")))
-				.andExpect(content().string(containsString("traceidratio")));
+				.andExpect(content().string(containsString("traceidratio")))
+			.andExpect(content().string(containsString("data-service-name=\"test-service\"")))
+			.andExpect(content().string(containsString("onclick=\"storeConfiguration(this.dataset.serviceName)\"")));
 		server.verify();
 	}
 

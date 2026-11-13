@@ -120,6 +120,22 @@ Notice that `otel.traces.sampler` must be set to `dynamic`, while the `sampler` 
 
 ## Building and testing
 
+Use JDK 21 to run Gradle and the applications. The Gradle wrapper verifies the
+checksum of its downloaded distribution.
+
+Dependency versions are declared in `gradle/libs.versions.toml`, with Spring Boot
+managing the application dependency set. Keep the OpenTelemetry SDK aligned with
+the version targeted by the upstream Java agent (currently SDK 1.67.0 and agent
+2.33.1). Jackson 3 also requires matching Jackson 2 annotations, managed through
+`jackson-2-bom.version` in `build.gradle`.
+
+The vendored frontend assets are Bootstrap 5.3.9, Bootstrap Icons 1.13.2 and
+js-yaml 5.5.0. Bootstrap's bundle includes Popper and does not require jQuery.
+
+CI submits the resolved dependency graph to GitHub on pushes to `main`, so
+Dependabot can evaluate the current versions. Dependabot also checks GitHub
+Actions, the Java container base images and the local observability images weekly.
+
 In order to test this setup, first start Jaeger and Prometheus by calling `docker compose up` found in the root folder. This will start a new Jaeger instance in Docker and expose port 4317 for tracing and <a href="http://localhost:16686">http://localhost:16686</a> for the UI. The Prometheus UI will be available at <a href="http://localhost:9090">http://localhost:9090</a>
 
 Now run `build-and-test.sh`. This will build the agent, run the tests, start the service instrumented using the built agent and launch the frontend on <a href="http://localhost:8081">http://localhost:8081</a>.
@@ -127,7 +143,7 @@ Now run `build-and-test.sh`. This will build the agent, run the tests, start the
 Since the configuration service is not started when it's being instrumented, obtaining the remote configuration will fail and defaults will be used. You will see something like this in the log:
 
 ```
-opentelemetry-javaagent - version: 2.28.0
+opentelemetry-javaagent - version: 2.33.1
 Could not connect to OTEL Configuration Service at http://localhost:8080,
 using sampler "parentbased_always_off".
 ```
@@ -172,6 +188,14 @@ The `DynamicSamplerProvider` will poll the service at regular intervals (current
 Releases are created from Git tags using the [release workflow](.github/workflows/release.yml). The workflow is compatible with GitHub immutable releases because it creates the release itself only after a successful build.
 
 Do not create releases manually in the GitHub UI.
+
+All three modules share the `releaseVersion` Gradle property, defined in the root
+build. The release workflow passes the Git tag as `-PreleaseVersion` for builds,
+publication, and the service/frontend JARs packaged into containers. This keeps
+the published artifact version and application build metadata aligned with the
+release tag. Local and untagged CI builds use `development` by default.
+
+To build locally with a release version, run `./gradlew build -PreleaseVersion=1.8.6`.
 
 ### Steps
 

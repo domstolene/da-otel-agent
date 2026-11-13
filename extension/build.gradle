@@ -6,7 +6,6 @@ plugins {
 }
 
 group = 'no.domstol.otel'
-version = findProperty('releaseVersion') ?: 'development'
 
 java {
   sourceCompatibility = JavaVersion.VERSION_17
@@ -86,6 +85,10 @@ dependencies {
   */
   implementation(libs.commons.lang3)
   implementation(libs.httpclient)
+  constraints {
+    implementation('commons-codec:commons-codec:1.23.0')
+    implementation('commons-logging:commons-logging:1.4.0')
+  }
   implementation(libs.jackson.databind)
   implementation(libs.jackson.dataformat.yaml)
 
