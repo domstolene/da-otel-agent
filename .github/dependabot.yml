@@ -12,10 +12,13 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "docker"
-    directory: "/.github/workflows"
+    directory: "/docker"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "docker"
+    ignore:
+      - dependency-name: "ibm-semeru-runtimes"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: "docker-compose"
     directory: "/"
     schedule:
       interval: "weekly"

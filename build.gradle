@@ -7,6 +7,11 @@ version = providers.gradleProperty('releaseVersion').getOrElse('development')
 subprojects {
   version = rootProject.version
 
+  // Patch Commons Lang pulled in by the Spring Boot Gradle plugin (CVE-2025-48924).
+  buildscript.configurations.classpath.resolutionStrategy.force(
+    "org.apache.commons:commons-lang3:${libs.versions.commons.lang3.get()}"
+  )
+
   // Keep Jackson annotations aligned with Jackson 3 and use patched releases.
   ext['jackson-2-bom.version'] = '2.23.0'
   ext['junit-jupiter.version'] = libs.versions.junit.jupiter.get()
