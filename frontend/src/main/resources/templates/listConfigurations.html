@@ -73,7 +73,8 @@
 						</td>
 						<td>
 							<button type="button" class="btn btn-outline-primary" title="Click to save configuration changes"
-								th:attr="onclick='storeConfiguration(\'' + ${config.serviceName} + '\')'"
+								th:attr="data-service-name=${config.serviceName}"
+									onclick="storeConfiguration(this.dataset.serviceName)"
 								th:disabled="${config.readOnly}">
 								<span th:unless="${config.readOnly}">
 									<i class="bi bi-floppy-fill"></i> Save
