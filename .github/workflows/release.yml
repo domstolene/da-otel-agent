@@ -43,7 +43,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v6
 
     - name: Gradle build agent and service
-      run: ./gradlew build --no-daemon
+      run: ./gradlew build -PreleaseVersion=${{ github.ref_name }} --no-daemon
 
     - name: Gradle publish agent
       env:
@@ -91,7 +91,7 @@ jobs:
             latest=auto
 
       - name: Build service jar
-        run: ./gradlew :service:bootJar --no-daemon
+        run: ./gradlew :service:bootJar -PreleaseVersion=${{ github.ref_name }} --no-daemon
 
       - name: Prepare service jar for Docker build context
         run: cp service/build/libs/service.jar service.jar
@@ -152,7 +152,7 @@ jobs:
             latest=auto
 
       - name: Build frontend jar
-        run: ./gradlew :frontend:bootJar --no-daemon
+        run: ./gradlew :frontend:bootJar -PreleaseVersion=${{ github.ref_name }} --no-daemon
 
       - name: Prepare frontend jar for Docker build context
         run: cp frontend/build/libs/frontend.jar frontend.jar

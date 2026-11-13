@@ -6,7 +6,6 @@ plugins {
 }
 
 group = 'no.domstol.otel'
-version = findProperty('releaseVersion') ?: 'development'
 
 java {
   sourceCompatibility = JavaVersion.VERSION_17

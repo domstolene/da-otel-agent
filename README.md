@@ -189,6 +189,14 @@ Releases are created from Git tags using the [release workflow](.github/workflow
 
 Do not create releases manually in the GitHub UI.
 
+All three modules share the `releaseVersion` Gradle property, defined in the root
+build. The release workflow passes the Git tag as `-PreleaseVersion` for builds,
+publication, and the service/frontend JARs packaged into containers. This keeps
+the published artifact version and application build metadata aligned with the
+release tag. Local and untagged CI builds use `development` by default.
+
+To build locally with a release version, run `./gradlew build -PreleaseVersion=1.8.6`.
+
 ### Steps
 
 1. Make sure the `main` branch contains the version you want to release.
